@@ -2153,8 +2153,7 @@ function surveyView() {
   const full = q.type === 'multi' && (val || []).length >= q.max;
   const opts = q.options.map(([k, label]) =>
     `<button type="button" class="sv-opt" data-opt="${k}" aria-pressed="${picked(k)}" ${full && !picked(k) ? 'aria-disabled="true"' : ''}><span class="box" aria-hidden="true"></span>${label}</button>`).join('');
-  const fol = q.follow && q.follow[val];
-  const follow = fol ? `<div class="field sv-follow"><label for="svFollow">${fol[0]}</label><input class="input" id="svFollow" maxlength="120" placeholder="${fol[1]}" value="${esc(surveyAns.source_detail || '')}"></div>` : '';
+  const follow = `<div id="svFollowWrap">${followHtml(q, val)}</div>`;
   const last = surveyStep === SURVEY.length - 1;
   svNoAnim = false;
   return `
@@ -2199,6 +2198,11 @@ function updateSurveyNext() {
   if (h) h.textContent = surveyBusy ? '' : surveyBlockReason();
 }
 
+function followHtml(q, val) {
+  const fol = q.follow && q.follow[val];
+  return fol ? `<div class="field sv-follow"><label for="svFollow">${fol[0]}</label><input class="input" id="svFollow" maxlength="120" placeholder="${fol[1]}" value="${esc(surveyAns.source_detail || '')}"></div>` : '';
+}
+
 function pickOption(k) {
   const q = SURVEY[surveyStep];
   if (q.type === 'multi') {
@@ -2210,13 +2214,23 @@ function pickOption(k) {
     if (q.key === 'source' && surveyAns.source !== k) surveyAns.source_detail = '';
     surveyAns[q.key] = k;
   }
-  svNoAnim = true;
-  showAuth('survey');
+  // تحديث الخيارات في مكانها بدون إعادة رسم الشاشة (بدون أي حركة)
+  const val = surveyAns[q.key];
+  const full = q.type === 'multi' && (val || []).length >= q.max;
+  $$('#authCard .sv-opt').forEach(b => {
+    const on = q.type === 'multi' ? (val || []).includes(b.dataset.opt) : val === b.dataset.opt;
+    b.setAttribute('aria-pressed', String(on));
+    if (full && !on) b.setAttribute('aria-disabled', 'true'); else b.removeAttribute('aria-disabled');
+  });
+  const wrap = $('#svFollowWrap');
+  const want = followHtml(q, val);
+  const hasSame = wrap && wrap.querySelector('label') && want.includes(wrap.querySelector('label').textContent);
+  if (wrap && !hasSame) {
+    wrap.innerHTML = want;
+    const fi = $('#svFollow');
+    if (fi) fi.focus();
+  }
   updateSurveyNext();
-  // لا ننتقل تلقائياً: الزبون يراجع اختياره ثم يضغط "التالي"
-  const fi = $('#svFollow');
-  if (fi) fi.focus();
-  else { const b = $('#svNext'); if (b && !b.disabled) b.focus({ preventScroll: true }); }
 }
 function surveyBack() { if (surveyStep > 0) { surveyStep--; showAuth('survey'); updateSurveyNext(); } }
 

@@ -1,0 +1,588 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>قريب — لوحة صاحب المشروع</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
+<style>
+/* =========================================================
+   رموز التصميم: نفس هوية قريب
+   ========================================================= */
+:root{
+  --plane:#ECEFEA; --surface:#FAFBF8; --ink:#14232A; --ink-2:#4B5B61; --ink-3:#77868B;
+  --line:#D2DAD4; --line-2:#E3E8E3; --grid:#E3E8E3;
+  --harbour:#0D4652; --harbour-2:#14697A; --harbour-deep:#072D36;
+  --bar:#14697A;            /* لون السلسلة الواحدة في كل الرسوم */
+  --bar-hi:#C98500;         /* إبراز أعلى قيمة فقط */
+  --saffron:#E2A23A; --saffron-soft:#F7E6C4; --saffron-ink:#6B4306;
+  --up:#1E6B4F; --down:#8E2C24;
+  --font:'Tajawal', system-ui, 'Segoe UI', Tahoma, sans-serif;
+  --r:14px;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{font-family:var(--font);font-size:15px;line-height:1.55;color:var(--ink);background:var(--plane);-webkit-font-smoothing:antialiased}
+button,input,select{font:inherit;color:inherit}
+button{cursor:pointer}
+[hidden]{display:none!important}
+:focus-visible{outline:2px solid var(--harbour-2);outline-offset:2px;border-radius:6px}
+.num{font-variant-numeric:tabular-nums}
+.ltr{direction:ltr;unicode-bidi:isolate}
+.sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+
+/* ---------- شاشة الدخول ---------- */
+.gate{min-height:100vh;display:grid;place-items:center;padding:24px}
+.gate-card{width:100%;max-width:400px;background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:30px 28px}
+.gate-card h1{font-size:24px;margin:14px 0 4px;font-weight:800}
+.gate-card p{color:var(--ink-2);margin:0 0 20px}
+.field{display:flex;flex-direction:column;gap:6px;margin-bottom:14px}
+.field label{font-weight:700;font-size:13.5px}
+.input{border:1px solid var(--line);border-radius:10px;background:#fff;padding:10px 12px;width:100%}
+.input:focus{border-color:var(--harbour-2);outline:none;box-shadow:0 0 0 3px rgba(20,105,122,.15)}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border:0;border-radius:10px;padding:9px 14px;font-weight:700}
+.btn-primary{background:var(--harbour);color:#fff}
+.btn-primary:hover{background:var(--harbour-2)}
+.btn-line{background:var(--surface);border:1px solid var(--line)}
+.btn-line:hover{background:var(--plane)}
+.btn-block{width:100%;padding:12px}
+.btn[disabled]{opacity:.6;cursor:progress}
+.btn-google{width:100%;display:flex;align-items:center;justify-content:center;gap:10px;background:#fff;border:1px solid var(--line);border-radius:10px;padding:11px;font-weight:700}
+.or{display:flex;align-items:center;gap:12px;color:var(--ink-3);font-size:13px;margin:16px 0}
+.or::before,.or::after{content:"";flex:1;height:1px;background:var(--line)}
+.err{color:#B3362D;font-size:14px;min-height:1.3em;margin-bottom:8px}
+.brand{display:flex;align-items:center;gap:10px}
+.brand svg{width:34px;height:34px;flex:none}
+.brand b{font-size:20px;font-weight:800;line-height:1}
+.brand small{display:block;color:var(--ink-3);font-size:12.5px;margin-top:3px}
+
+/* ---------- الشريط العلوي والفلاتر ---------- */
+.top{position:sticky;top:0;z-index:10;background:var(--surface);border-bottom:1px solid var(--line);padding:12px 28px;display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+.top .brand{margin-inline-end:auto}
+.range{display:flex;background:var(--line-2);border-radius:999px;padding:3px}
+.range button{border:0;background:none;border-radius:999px;padding:6px 14px;font-weight:700;font-size:13.5px;color:var(--ink-2)}
+.range button[aria-pressed="true"]{background:var(--surface);color:var(--ink);box-shadow:0 0 0 1px var(--line)}
+.updated{color:var(--ink-3);font-size:12.5px}
+.who{color:var(--ink-2);font-size:13px;font-weight:700}
+
+main{padding:24px 28px 60px;max-width:1440px;margin:0 auto;display:flex;flex-direction:column;gap:22px}
+.sec-title{display:flex;align-items:baseline;justify-content:space-between;gap:12px;margin:8px 0 10px}
+.sec-title h2{margin:0;font-size:19px;font-weight:800}
+.sec-title p{margin:0;color:var(--ink-3);font-size:13.5px}
+
+/* ---------- المؤشرات ---------- */
+.kpis{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));background:var(--surface);border:1px solid var(--line);border-radius:var(--r)}
+.kpi{padding:16px 18px 18px}
+.kpi + .kpi{border-inline-start:1px solid var(--line-2)}
+.kpi span{display:block;color:var(--ink-2);font-size:13.5px}
+.kpi b{display:block;font-size:30px;font-weight:800;line-height:1.15;margin-top:4px}
+.kpi small{display:block;color:var(--ink-3);font-size:12.5px;margin-top:2px}
+.kpi small .up{color:var(--up);font-weight:700}
+
+/* ---------- بطاقات الرسوم ---------- */
+.grid{display:grid;gap:18px}
+.g2{grid-template-columns:repeat(2,minmax(0,1fr))}
+.g3{grid-template-columns:repeat(3,minmax(0,1fr))}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:18px 20px 20px;min-width:0}
+.card h3{margin:0;font-size:15.5px;font-weight:800}
+.card .sub{margin:2px 0 14px;color:var(--ink-3);font-size:13px}
+.card.feature{border-top:3px solid var(--saffron)}
+
+/* أعمدة أفقية (HTML) */
+.hbars{display:flex;flex-direction:column;gap:7px}
+.hbar{display:grid;grid-template-columns:minmax(96px,150px) minmax(0,1fr) 74px;align-items:center;gap:10px;font-size:13.5px;border-radius:6px;padding:2px 4px;margin:0 -4px}
+.hbar:hover{background:var(--plane)}
+.hbar .lbl{color:var(--ink-2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.hbar .trk{height:12px;position:relative}
+.hbar .fill{position:absolute;inset-block:0;inset-inline-start:0;background:var(--bar);border-radius:0 4px 4px 0;min-width:2px;transition:width .4s cubic-bezier(.2,.7,.2,1)}
+[dir=rtl] .hbar .fill{border-radius:4px 0 0 4px}
+.hbar.top-1 .fill{background:var(--bar-hi)}
+.hbar.zero .fill{background:var(--line)}
+.hbar .val{display:flex;gap:8px;justify-content:flex-end;align-items:baseline;font-weight:700;white-space:nowrap}
+.hbar .val small{color:var(--ink-3);font-weight:500;font-size:12px;min-width:30px;text-align:left}
+.empty{color:var(--ink-3);font-size:14px;padding:18px 0;text-align:center}
+
+/* القمع */
+.funnel .hbar{grid-template-columns:minmax(120px,170px) minmax(0,1fr) 120px}
+.funnel .drop{color:var(--ink-3);font-size:12px;padding-inline-start:180px;margin:-3px 0 2px}
+
+/* أعمدة يومية (SVG) */
+.daily svg{width:100%;height:auto;display:block;overflow:visible}
+.daily .gl{stroke:var(--grid);stroke-width:1}
+.daily .base{stroke:#C3C9C4;stroke-width:1}
+.daily .tick{fill:var(--ink-3);font-size:10.5px;font-family:var(--font)}
+.daily rect.b{fill:var(--bar)}
+.daily rect.hit{fill:transparent}
+.daily rect.hit:hover + rect.b, .daily g.on rect.b{fill:var(--harbour)}
+.total-line{font-size:13px;color:var(--ink-2);margin:-8px 0 10px}
+.total-line b{color:var(--ink)}
+
+/* الإشارات النصية */
+.mentions{display:flex;flex-wrap:wrap;gap:6px;margin-top:14px;padding-top:12px;border-top:1px solid var(--line-2)}
+.mentions span{background:var(--plane);border-radius:999px;padding:3px 10px;font-size:13px}
+.mentions em{font-style:normal;color:var(--ink-3);font-size:12px;margin-inline-start:4px}
+
+/* الجداول */
+.tbar{display:flex;gap:10px;align-items:center;margin-bottom:10px;flex-wrap:wrap}
+.tbar .input{max-width:260px;padding:8px 12px}
+.tbl{overflow:auto;border:1px solid var(--line);border-radius:var(--r);background:var(--surface);max-height:520px}
+table{width:100%;border-collapse:collapse;font-size:13.5px}
+th{position:sticky;top:0;background:var(--surface);text-align:start;color:var(--ink-2);font-size:12.5px;font-weight:700;padding:10px 12px;border-bottom:1px solid var(--line);white-space:nowrap}
+th button{border:0;background:none;padding:0;font-weight:700;color:inherit;display:inline-flex;gap:4px;align-items:center}
+th[aria-sort] button::after{content:"↕";color:var(--ink-3);font-size:11px}
+th[aria-sort="ascending"] button::after{content:"↑";color:var(--ink)}
+th[aria-sort="descending"] button::after{content:"↓";color:var(--ink)}
+td{padding:9px 12px;border-bottom:1px solid var(--line-2);white-space:nowrap}
+tr:last-child td{border-bottom:0}
+td.wrap{white-space:normal;min-width:160px}
+.pill{display:inline-block;background:var(--plane);border-radius:999px;padding:1px 8px;font-size:12px;margin:1px}
+
+/* تلميح عائم */
+.tip{position:fixed;z-index:50;pointer-events:none;background:var(--ink);color:#fff;border-radius:8px;padding:7px 10px;font-size:13px;line-height:1.45;opacity:0;transform:translateY(4px);transition:opacity .12s,transform .12s;max-width:240px}
+.tip.show{opacity:1;transform:none}
+.tip b{font-size:15px}
+
+.loading{display:grid;place-items:center;min-height:60vh;color:var(--ink-2)}
+.spinner{display:inline-block;width:32px;height:32px;border-radius:50%;border:3px solid var(--line);border-top-color:var(--harbour);animation:spin .8s linear infinite;margin-bottom:10px}
+@keyframes spin{to{transform:rotate(360deg)}}
+.banner{background:var(--saffron-soft);color:var(--saffron-ink);border-radius:12px;padding:12px 16px;font-size:14px}
+
+@media (max-width:1200px){.kpis{grid-template-columns:repeat(3,1fr)}.kpi:nth-child(4){border-inline-start:0}.kpi:nth-child(n+4){border-top:1px solid var(--line-2)}.g3{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:760px){
+  .top{padding:10px 14px}main{padding:16px 12px 40px}
+  .kpis{grid-template-columns:repeat(2,1fr)}.kpi:nth-child(odd){border-inline-start:0}.kpi:nth-child(n+3){border-top:1px solid var(--line-2)}.kpi:nth-child(4){border-inline-start:1px solid var(--line-2)}
+  .g2,.g3{grid-template-columns:1fr}
+  .updated,.who{display:none}
+  .funnel .drop{padding-inline-start:0}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation-duration:.01ms!important}}
+</style>
+</head>
+<body>
+
+<!-- =================== الدخول =================== -->
+<div class="gate" id="gate" hidden>
+  <div class="gate-card" id="gateCard"></div>
+</div>
+
+<!-- =================== اللوحة =================== -->
+<div id="dash" hidden>
+  <header class="top">
+    <div class="brand">
+      <svg viewBox="0 0 36 36" aria-hidden="true"><circle cx="18" cy="18" r="16" fill="none" stroke="#0D4652" stroke-width="2" opacity=".35"/><circle cx="18" cy="18" r="10" fill="none" stroke="#E2A23A" stroke-width="2.4"/><circle cx="18" cy="18" r="3.6" fill="#0D4652"/></svg>
+      <div><b>قريب</b><small>لوحة صاحب المشروع</small></div>
+    </div>
+    <div class="range" role="group" aria-label="الفترة">
+      <button type="button" data-range="7" aria-pressed="false">7 أيام</button>
+      <button type="button" data-range="30" aria-pressed="false">30 يوم</button>
+      <button type="button" data-range="90" aria-pressed="false">90 يوم</button>
+      <button type="button" data-range="0" aria-pressed="true">الكل</button>
+    </div>
+    <span class="updated num" id="updated" aria-live="polite"></span>
+    <button type="button" class="btn btn-line" id="refresh">تحديث</button>
+    <span class="who" id="who"></span>
+    <button type="button" class="btn btn-line" id="logout">خروج</button>
+  </header>
+
+  <main id="main"></main>
+</div>
+
+<div class="tip" id="tip" role="tooltip"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.119.2/dist/umd/supabase.js"></script>
+<script>
+'use strict';
+/* =====================================================================
+   لوحة صاحب مشروع قريب
+   ---------------------------------------------------------------------
+   - الدخول بنفس حساب قريب (بريد/كلمة سر أو Google).
+   - البيانات تأتي من دالة واحدة محمية في Supabase: admin_overview()
+     ترفض أي حساب غير موجود في جدول platform_admins.
+   - لا تعرض أسماء أو أرقام زبائن المحلات، فقط أعداد وتواريخ.
+   ===================================================================== */
+const SB_URL = 'https://civyggmjqefqzofnfqqc.supabase.co';
+const SB_KEY = 'sb_publishable_iTKRPpH03PyEj1JoWVfX0A_eriEbKCs';
+const PAGE_URL = location.origin + location.pathname;
+const sb = window.supabase ? window.supabase.createClient(SB_URL, SB_KEY, { auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true } }) : null;
+
+/* ---------- أدوات ---------- */
+const $ = (s, r = document) => r.querySelector(s);
+const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[c]));
+const LOC = 'ar-LY-u-nu-latn';
+const nf = new Intl.NumberFormat('en-US'); // 2,546 بدل 2.546 حتى لا تُقرأ كعدد عشري
+const dateF = new Intl.DateTimeFormat(LOC, { day: 'numeric', month: 'short', year: 'numeric' });
+const dayF = new Intl.DateTimeFormat(LOC, { day: 'numeric', month: 'short' });
+const timeF = new Intl.DateTimeFormat(LOC, { hour: '2-digit', minute: '2-digit', hour12: false });
+const fmtN = n => nf.format(n);
+const pct = (a, b) => (b ? Math.round(a / b * 100) : 0);
+const DAY = 86400000;
+const dayKey = d => { const x = new Date(d); return x.getFullYear() + '-' + String(x.getMonth() + 1).padStart(2, '0') + '-' + String(x.getDate()).padStart(2, '0'); };
+function withTimeout(p, ms = 20000) {
+  let t; return Promise.race([p, new Promise((_, r) => { t = setTimeout(() => r({ code: 'timeout' }), ms); })]).finally(() => clearTimeout(t));
+}
+
+/* ---------- تسميات إجابات الاستبيان (نفس مفاتيح التطبيق) ---------- */
+const LABELS = {
+  source: { facebook: 'فيسبوك', instagram: 'إنستغرام', tiktok: 'تيك توك', whatsapp: 'واتساب', referral: 'صاحب محل أو صديق', sales_rep: 'مندوب', saw_in_store: 'رمز قريب في محل آخر', google: 'بحث Google', other: 'مصدر آخر' },
+  business_type: { cafe: 'مقهى', restaurant: 'مطعم', sweets: 'حلويات أو مخبز', fashion: 'ملابس وأحذية', grocery: 'ماركت', other: 'نشاط آخر' },
+  daily_customers: { lt50: 'أقل من 50', '50_150': '50 إلى 150', '150_300': '150 إلى 300', gt300: 'أكثر من 300' },
+  goals: { repeat: 'الزبون يرجع أكثر', quiet_hours: 'تعبئة الأوقات الهادئة', queue: 'تخفيف الزحمة', contacts: 'جمع أرقام الزبائن', compete: 'التميّز على المنافسين' },
+  current_loyalty: { none: 'ما عنده طريقة', paper: 'بطاقة أختام ورقية', social: 'عروض على السوشال', personal: 'يعرفهم ويكرمهم بنفسه', app: 'تطبيق أو نظام آخر' }
+};
+const ORDERED = { daily_customers: ['lt50', '50_150', '150_300', 'gt300'] }; // فئات لها ترتيب طبيعي
+
+/* =========================== الدخول =========================== */
+const GOOGLE_SVG = `<svg width="18" height="18" viewBox="0 0 48 48" aria-hidden="true"><path fill="#FFC107" d="M43.6 20.5H42V20H24v8h11.3C33.7 32.7 29.2 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.8 1.2 7.9 3.1l5.7-5.7C34 6.1 29.3 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20 20-8.9 20-20c0-1.3-.1-2.4-.4-3.5z"/><path fill="#FF3D00" d="m6.3 14.7 6.6 4.8C14.7 15.1 19 12 24 12c3.1 0 5.8 1.2 7.9 3.1l5.7-5.7C34 6.1 29.3 4 24 4 16.3 4 9.7 8.3 6.3 14.7z"/><path fill="#4CAF50" d="M24 44c5.2 0 9.9-2 13.4-5.2l-6.2-5.2C29.2 35.1 26.7 36 24 36c-5.2 0-9.6-3.3-11.3-7.9l-6.5 5C9.5 39.6 16.2 44 24 44z"/><path fill="#1976D2" d="M43.6 20.5H42V20H24v8h11.3c-.8 2.2-2.2 4.2-4.1 5.6l6.2 5.2C37 39.2 44 34 44 24c0-1.3-.1-2.4-.4-3.5z"/></svg>`;
+const BRAND = $('.brand').outerHTML;
+
+function showGate(view, msg = '') {
+  $('#dash').hidden = true;
+  $('#gate').hidden = false;
+  const c = $('#gateCard');
+  if (view === 'loading') { c.innerHTML = `<div style="text-align:center;padding:20px 0"><span class="spinner"></span><p>جاري التحميل...</p></div>`; return; }
+  if (view === 'denied') {
+    c.innerHTML = `${BRAND}<h1>هذه اللوحة لصاحب المشروع فقط</h1><p>الحساب <b class="ltr">${esc(msg)}</b> ما عندهش صلاحية. ادخل بحساب صاحب المشروع.</p>
+      <button type="button" class="btn btn-primary btn-block" id="gOut">الدخول بحساب آخر</button>`;
+    $('#gOut').onclick = async () => { await sb.auth.signOut(); showGate('login'); };
+    return;
+  }
+  c.innerHTML = `${BRAND}
+    <h1>لوحة صاحب المشروع</h1>
+    <p>ادخل بحساب قريب اللي عنده صلاحية الإدارة.</p>
+    <button type="button" class="btn-google" id="gGoogle">${GOOGLE_SVG}الدخول بحساب Google</button>
+    <div class="or">أو بالبريد</div>
+    <form id="gForm" novalidate>
+      <div class="field"><label for="gEmail">البريد الإلكتروني</label><input class="input ltr" style="text-align:right" id="gEmail" type="email" autocomplete="email" required></div>
+      <div class="field"><label for="gPass">كلمة السر</label><input class="input ltr" style="text-align:right" id="gPass" type="password" autocomplete="current-password" required></div>
+      <div class="err" role="alert">${esc(msg)}</div>
+      <button class="btn btn-primary btn-block" type="submit">دخول</button>
+    </form>`;
+  $('#gGoogle').onclick = async () => {
+    const { error } = await sb.auth.signInWithOAuth({ provider: 'google', options: { redirectTo: PAGE_URL } });
+    if (error) $('#gateCard .err').textContent = 'تعذّر الدخول بحساب Google.';
+  };
+  $('#gForm').onsubmit = async e => {
+    e.preventDefault();
+    const btn = e.target.querySelector('button[type=submit]');
+    btn.disabled = true; btn.textContent = 'جاري الدخول...';
+    const { data, error } = await sb.auth.signInWithPassword({ email: $('#gEmail').value.trim(), password: $('#gPass').value });
+    btn.disabled = false; btn.textContent = 'دخول';
+    if (error) { $('#gateCard .err').textContent = error.code === 'invalid_credentials' ? 'البريد أو كلمة السر غير صحيحة.' : 'تعذّر الدخول: ' + error.message; return; }
+    open(data.session);
+  };
+}
+
+/* =========================== البيانات =========================== */
+let raw = null;          // آخر بيانات من الخادم
+let rangeDays = 0;       // 0 = الكل
+let session = null;
+let opening = false;
+
+async function open(s) {
+  if (!s || opening) return;
+  opening = true; session = s;
+  showGate('loading');
+  try { await load(); }
+  catch (err) {
+    if (err && (err.code === '42501' || (err.message || '').includes('not_admin'))) showGate('denied', s.user.email || '');
+    else showGate('login', err && err.code === 'timeout' ? 'الخادم ما ردّش. حاول مرة ثانية.' : 'تعذّر تحميل البيانات: ' + ((err && err.message) || ''));
+  } finally { opening = false; }
+}
+
+async function load() {
+  const btn = $('#refresh'); btn.disabled = true; btn.textContent = 'جاري التحديث...';
+  try {
+    const { data, error } = await withTimeout(sb.rpc('admin_overview'));
+    if (error) throw error;
+    raw = data;
+    $('#gate').hidden = true; $('#dash').hidden = false;
+    $('#who').textContent = session.user.email || '';
+    $('#updated').textContent = 'آخر تحديث ' + timeF.format(new Date());
+    render();
+  } finally { btn.disabled = false; btn.textContent = 'تحديث'; }
+}
+
+// تطبيق فلتر الفترة على كل شي حسب تاريخ الإنشاء
+function inRange(d) { return !rangeDays || Date.parse(d) >= Date.now() - rangeDays * DAY; }
+function view() {
+  const users = raw.users.filter(u => inRange(u.created_at));
+  const stores = raw.stores.filter(s => inRange(s.created_at));
+  const surveys = raw.surveys.filter(s => inRange(s.created_at));
+  const customers = raw.customers.filter(c => inRange(c.created_at));
+  return { users, stores, surveys, customers };
+}
+
+/* =========================== الرسم =========================== */
+function countBy(list, key, multi = false) {
+  const m = new Map();
+  list.forEach(r => {
+    const v = r[key];
+    (multi ? (v || []) : [v]).forEach(k => { if (k != null && k !== '') m.set(k, (m.get(k) || 0) + 1); });
+  });
+  return m;
+}
+
+// أعمدة أفقية: سلسلة واحدة بلون واحد، وأعلى قيمة بلون الإبراز
+function hbars(map, labels, { total, order, highlight = true, unit = '' } = {}) {
+  let rows = [...map.entries()];
+  if (order) {
+    rows = order.map(k => [k, map.get(k) || 0]);
+  } else {
+    if (labels) Object.keys(labels).forEach(k => { if (!map.has(k)) rows.push([k, 0]); });
+    rows.sort((a, b) => b[1] - a[1]);
+  }
+  const sum = total ?? rows.reduce((a, r) => a + r[1], 0);
+  if (!sum) return `<div class="empty">لا توجد بيانات في هذه الفترة.</div>`;
+  const max = Math.max(...rows.map(r => r[1]), 1);
+  const top = Math.max(...rows.map(r => r[1]));
+  return `<div class="hbars">${rows.map(([k, v]) => {
+    const name = (labels && labels[k]) || k;
+    const p = pct(v, sum);
+    const cls = v === 0 ? 'zero' : (highlight && !order && v === top && rows.filter(r => r[1] === top).length === 1 ? 'top-1' : '');
+    return `<div class="hbar ${cls}" data-tip="<b>${esc(name)}</b><br>${fmtN(v)}${unit} من ${fmtN(sum)} (${p}%)">
+      <span class="lbl" title="${esc(name)}">${esc(name)}</span>
+      <span class="trk"><span class="fill" style="width:${(v / max * 100).toFixed(1)}%"></span></span>
+      <span class="val num">${fmtN(v)}<small>${p}%</small></span></div>`;
+  }).join('')}</div>`;
+}
+
+// أعمدة يومية بـ SVG مع تلميح عند التمرير
+function daily(list, days) {
+  const n = days || Math.max(14, Math.min(120, Math.ceil((Date.now() - Math.min(...list.map(x => Date.parse(x.created_at)), Date.now())) / DAY) + 1));
+  const buckets = [];
+  for (let i = n - 1; i >= 0; i--) { const d = new Date(Date.now() - i * DAY); buckets.push({ key: dayKey(d), date: d, v: 0 }); }
+  const idx = new Map(buckets.map((b, i) => [b.key, i]));
+  list.forEach(x => { const i = idx.get(dayKey(x.created_at)); if (i !== undefined) buckets[i].v++; });
+  const total = buckets.reduce((a, b) => a + b.v, 0);
+  const W = 600, H = 150, padB = 20, padT = 8;
+  const max = Math.max(1, ...buckets.map(b => b.v));
+  const niceMax = max <= 4 ? max : Math.ceil(max / 5) * 5;
+  const bw = W / n, gap = Math.min(4, bw * .25);
+  const y = v => padT + (H - padB - padT) * (1 - v / niceMax);
+  const grid = [0.5, 1].map(f => `<line class="gl" x1="0" x2="${W}" y1="${y(niceMax * f)}" y2="${y(niceMax * f)}"/><text class="tick" x="${W + 4}" y="${y(niceMax * f) + 4}" text-anchor="start">${fmtN(Math.round(niceMax * f))}</text>`).join('');
+  const step = Math.ceil(n / 6);
+  // الأيام من اليمين (الأقدم) إلى اليسار (الأحدث) لأن الصفحة RTL
+  const xOf = i => W - (i + 1) * bw;
+  const bars = buckets.map((b, i) => {
+    const h = (H - padB) - y(b.v);
+    const x = xOf(i) + gap / 2, w = Math.max(1, bw - gap);
+    const tip = `<b>${fmtN(b.v)}</b><br>${dayF.format(b.date)}`;
+    return `<g data-tip="${esc(tip)}"><rect class="hit" x="${xOf(i)}" y="${padT}" width="${bw}" height="${H - padB - padT}"/>${b.v ? `<rect class="b" x="${x}" y="${y(b.v)}" width="${w}" height="${Math.max(h, 0)}" rx="${Math.min(3, w / 2)}"/>` : ''}</g>`;
+  }).join('');
+  const ticks = buckets.map((b, i) => (i % step === 0 || i === n - 1) ? `<text class="tick" x="${xOf(i) + bw / 2}" y="${H - 4}" text-anchor="middle">${dayF.format(b.date)}</text>` : '').join('');
+  return { total, svg: `<svg viewBox="-2 0 ${W + 30} ${H}" role="img" aria-label="رسم يومي">${grid}<line class="base" x1="0" x2="${W}" y1="${H - padB}" y2="${H - padB}"/>${bars}${ticks}</svg>` };
+}
+
+function render() {
+  const v = view(), all = raw;
+  const storeOwners = new Set(v.stores.map(s => s.owner_id));
+  const surveyOwners = new Set(v.surveys.map(s => s.owner_id));
+  const custByStore = countBy(all.customers, 'store_id');
+  const activated = v.stores.filter(s => custByStore.get(s.id)).length;
+  const last7 = all.customers.filter(c => Date.parse(c.created_at) >= Date.now() - 7 * DAY).length;
+  const visits = v.customers.reduce((a, c) => a + (c.visits || 0), 0);
+  const waYes = v.customers.filter(c => c.wa).length;
+  const providers = { email: 0, google: 0 };
+  v.users.forEach(u => (u.providers || []).forEach(p => { if (p in providers) providers[p]++; }));
+  const unconfirmed = v.users.filter(u => !u.confirmed).length;
+  const periodLabel = rangeDays ? `آخر ${rangeDays} يوم` : 'منذ البداية';
+
+  // 1) المؤشرات الرئيسية
+  const kpis = `
+    <section class="kpis" aria-label="المؤشرات الرئيسية">
+      <div class="kpi"><span>حسابات أصحاب المحلات</span><b class="num">${fmtN(v.users.length)}</b><small>${fmtN(providers.google)} عبر <bdi>Google</bdi>، و${fmtN(providers.email)} بالبريد${unconfirmed ? `، ${fmtN(unconfirmed)} لم يؤكد بريده` : ''}</small></div>
+      <div class="kpi"><span>محلات جاهزة</span><b class="num">${fmtN(v.stores.length)}</b><small>${pct(v.stores.length, v.users.length)}% من الحسابات أكملت الإعداد</small></div>
+      <div class="kpi"><span>أكملوا الاستبيان</span><b class="num">${fmtN(v.surveys.length)}</b><small>${pct(v.surveys.length, v.stores.length)}% من المحلات</small></div>
+      <div class="kpi"><span>زبائن انضموا عبر QR</span><b class="num">${fmtN(v.customers.length)}</b><small><span class="up ltr">+${fmtN(last7)}</span> في آخر 7 أيام</small></div>
+      <div class="kpi"><span>إجمالي الزيارات</span><b class="num">${fmtN(visits)}</b><small>${v.customers.length ? (visits / v.customers.length).toFixed(1) : 0} زيارة لكل زبون</small></div>
+      <div class="kpi"><span>وافقوا على واتساب</span><b class="num">${pct(waYes, v.customers.length)}%</b><small>${fmtN(waYes)} من ${fmtN(v.customers.length)} زبون</small></div>
+    </section>`;
+
+  // 2) قمع التسجيل
+  const steps = [
+    ['أنشأ حساب', v.users.length],
+    ['جهّز المحل', v.users.filter(u => storeOwners.has(u.id)).length],
+    ['أكمل الاستبيان', v.users.filter(u => surveyOwners.has(u.id)).length],
+    ['أول زبون انضم', activated]
+  ];
+  const fmax = Math.max(1, steps[0][1]);
+  const funnel = steps.map(([name, val], i) => {
+    const prev = i ? steps[i - 1][1] : val;
+    const p = pct(val, steps[0][1]);
+    const drop = i && prev ? `<div class="drop num">${pct(val, prev)}% من المرحلة السابقة</div>` : '';
+    return `${drop}<div class="hbar" data-tip="<b>${esc(name)}</b><br>${fmtN(val)} (${p}% من كل الحسابات)">
+      <span class="lbl">${name}</span><span class="trk"><span class="fill" style="width:${(val / fmax * 100).toFixed(1)}%"></span></span>
+      <span class="val num">${fmtN(val)}<small>${p}%</small></span></div>`;
+  }).join('');
+
+  // 3) النمو اليومي
+  const du = daily(v.users, rangeDays), dc = daily(v.customers, rangeDays);
+
+  // 4) الاستبيان
+  const S = v.surveys, n = S.length;
+  const mentions = S.filter(s => s.source_detail).map(s => `<span>${esc(s.source_detail)}<em>${esc(LABELS.source[s.source] || s.source)}</em></span>`).join('');
+  const cityMap = countBy(v.stores, 'city');
+
+  // 5) جدول المحلات
+  const surveyBy = new Map(raw.surveys.map(s => [s.owner_id, s]));
+  const userBy = new Map(raw.users.map(u => [u.id, u]));
+  const custAgg = new Map();
+  raw.customers.forEach(c => { const a = custAgg.get(c.store_id) || { n: 0, visits: 0, wa: 0, last: 0 }; a.n++; a.visits += c.visits || 0; a.wa += c.wa ? 1 : 0; a.last = Math.max(a.last, Date.parse(c.created_at)); custAgg.set(c.store_id, a); });
+  storeRows = v.stores.map(s => {
+    const a = custAgg.get(s.id) || { n: 0, visits: 0, wa: 0, last: 0 };
+    const u = userBy.get(s.owner_id) || {};
+    const sv = surveyBy.get(s.owner_id);
+    return { name: s.name, owner: s.owner_name, email: u.email || '', city: s.city, type: LABELS.business_type[s.business_type] || '—',
+      source: sv ? (LABELS.source[sv.source] || sv.source) : 'لم يكمل', customers: a.n, visits: a.visits, wa: pct(a.wa, a.n),
+      created: Date.parse(s.created_at), lastSignIn: u.last_sign_in_at ? Date.parse(u.last_sign_in_at) : 0, lastJoin: a.last };
+  });
+
+  $('#main').innerHTML = `
+    ${raw.users.length < 5 ? `<div class="banner">البيانات قليلة الآن (${fmtN(raw.users.length)} حساب). النسب تصبح مفيدة بعد ما يسجّل عدد أكبر من أصحاب المحلات.</div>` : ''}
+    ${kpis}
+
+    <div class="grid g2">
+      <section class="card feature">
+        <h3>من وين يجي أصحاب المحلات؟</h3>
+        <p class="sub">إجابة سؤال «كيف سمعت عن قريب؟» (${fmtN(n)} إجابة، ${periodLabel})</p>
+        ${hbars(countBy(S, 'source'), LABELS.source)}
+        ${mentions ? `<div class="mentions" aria-label="تفاصيل المصادر">${mentions}</div>` : ''}
+      </section>
+      <section class="card">
+        <h3>قمع التسجيل</h3>
+        <p class="sub">كم حساب وصل لكل مرحلة (${periodLabel})</p>
+        <div class="hbars funnel">${funnel}</div>
+      </section>
+    </div>
+
+    <div class="grid g2">
+      <section class="card daily">
+        <h3>حسابات جديدة في اليوم</h3>
+        <p class="sub">أصحاب محلات سجّلوا</p>
+        <p class="total-line">المجموع: <b class="num">${fmtN(du.total)}</b></p>
+        ${du.svg}
+      </section>
+      <section class="card daily">
+        <h3>زبائن جدد في اليوم</h3>
+        <p class="sub">انضموا بمسح رمز QR في كل المحلات</p>
+        <p class="total-line">المجموع: <b class="num">${fmtN(dc.total)}</b></p>
+        ${dc.svg}
+      </section>
+    </div>
+
+    <div class="sec-title"><h2>نتائج الاستبيان</h2><p>${fmtN(n)} إجابة</p></div>
+    <div class="grid g3">
+      <section class="card"><h3>نوع المحل</h3><p class="sub">النشاط اللي اختاره صاحب المحل</p>${hbars(countBy(S, 'business_type'), LABELS.business_type)}</section>
+      <section class="card"><h3>عدد الزبائن في اليوم</h3><p class="sub">حجم المحل تقريباً، مرتّب من الأصغر</p>${hbars(countBy(S, 'daily_customers'), LABELS.daily_customers, { order: ORDERED.daily_customers })}</section>
+      <section class="card"><h3>أهم الأهداف</h3><p class="sub">يختار حتى هدفين، فالنسبة من عدد المجيبين</p>${hbars(countBy(S, 'goals', true), LABELS.goals, { total: n })}</section>
+      <section class="card"><h3>كيف يكافئ زبائنه الآن</h3><p class="sub">المنافس الحقيقي لقريب</p>${hbars(countBy(S, 'current_loyalty'), LABELS.current_loyalty)}</section>
+      <section class="card"><h3>المدن</h3><p class="sub">مدينة كل محل</p>${hbars(cityMap, null)}</section>
+      <section class="card"><h3>حالة المحلات الآن</h3><p class="sub">آخر حالة اختارها الكاشير</p>${hbars(countBy(v.stores, 'status'), { quiet: 'هادئ - وقت ذهبي', busy: 'زحمة' }, { highlight: false })}</section>
+    </div>
+
+    <div class="sec-title"><h2>المحلات</h2><p>${fmtN(v.stores.length)} محل</p></div>
+    <div class="tbar">
+      <label class="sr-only" for="q">بحث في المحلات</label>
+      <input class="input" id="q" type="search" placeholder="ابحث باسم المحل أو صاحبه أو المدينة" value="${esc(query)}">
+      <button type="button" class="btn btn-line" id="csvStores">تنزيل المحلات CSV</button>
+      <button type="button" class="btn btn-line" id="csvSurvey">تنزيل إجابات الاستبيان CSV</button>
+    </div>
+    <div class="tbl"><table>
+      <thead><tr>${STORE_COLS.map(([k, label]) => `<th scope="col" aria-sort="${sortKey === k ? sortDir : 'none'}"><button type="button" data-sort="${k}">${label}</button></th>`).join('')}</tr></thead>
+      <tbody id="storeBody"></tbody>
+    </table></div>
+  `;
+  renderStoreTable();
+  $('#q').addEventListener('input', e => { query = e.target.value; renderStoreTable(); });
+  $('#csvStores').onclick = exportStores;
+  $('#csvSurvey').onclick = exportSurveys;
+}
+
+/* ---------- جدول المحلات: بحث وترتيب ---------- */
+let storeRows = [], query = '', sortKey = 'created', sortDir = 'descending';
+const STORE_COLS = [['name', 'المحل'], ['owner', 'صاحب المحل'], ['email', 'البريد'], ['city', 'المدينة'], ['type', 'النشاط'], ['source', 'سمع عنّا من'],
+  ['customers', 'الزبائن'], ['visits', 'الزيارات'], ['wa', 'واتساب %'], ['created', 'تاريخ التسجيل'], ['lastSignIn', 'آخر دخول']];
+function renderStoreTable() {
+  const q = query.trim();
+  let rows = storeRows.filter(r => !q || [r.name, r.owner, r.city, r.email].some(x => String(x).includes(q)));
+  rows.sort((a, b) => { const x = a[sortKey], y = b[sortKey]; const c = typeof x === 'number' ? x - y : String(x).localeCompare(String(y), 'ar'); return sortDir === 'ascending' ? c : -c; });
+  $('#storeBody').innerHTML = rows.length ? rows.map(r => `<tr>
+    <td><b>${esc(r.name)}</b></td><td>${esc(r.owner)}</td><td class="ltr">${esc(r.email)}</td><td>${esc(r.city)}</td><td>${esc(r.type)}</td>
+    <td>${r.source === 'لم يكمل' ? `<span style="color:var(--ink-3)">لم يكمل</span>` : esc(r.source)}</td>
+    <td class="num">${fmtN(r.customers)}</td><td class="num">${fmtN(r.visits)}</td><td class="num">${r.customers ? r.wa + '%' : '—'}</td>
+    <td class="num">${dateF.format(r.created)}</td><td class="num">${r.lastSignIn ? dateF.format(r.lastSignIn) : '—'}</td></tr>`).join('')
+    : `<tr><td colspan="${STORE_COLS.length}" class="empty">لا توجد محلات تطابق البحث.</td></tr>`;
+  $$('th[aria-sort]').forEach(th => th.setAttribute('aria-sort', th.querySelector('button').dataset.sort === sortKey ? sortDir : 'none'));
+}
+document.addEventListener('click', e => {
+  const b = e.target.closest('[data-sort]');
+  if (!b) return;
+  if (sortKey === b.dataset.sort) sortDir = sortDir === 'ascending' ? 'descending' : 'ascending';
+  else { sortKey = b.dataset.sort; sortDir = ['name', 'owner', 'email', 'city', 'type', 'source'].includes(sortKey) ? 'ascending' : 'descending'; }
+  renderStoreTable();
+});
+
+/* ---------- تصدير CSV (مع BOM حتى يفتح العربي صح في Excel) ---------- */
+function downloadCSV(name, header, rows) {
+  const cell = v => { const s = String(v ?? ''); return /[",\n]/.test(s) ? '"' + s.replace(/"/g, '""') + '"' : s; };
+  const csv = '﻿' + [header, ...rows].map(r => r.map(cell).join(',')).join('\n');
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8' }));
+  a.download = name; document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+}
+const isoDay = ms => ms ? new Date(ms).toISOString().slice(0, 10) : '';
+function exportStores() {
+  downloadCSV(`qareeb-stores-${isoDay(Date.now())}.csv`, STORE_COLS.map(c => c[1]),
+    storeRows.map(r => [r.name, r.owner, r.email, r.city, r.type, r.source, r.customers, r.visits, r.customers ? r.wa : '', isoDay(r.created), isoDay(r.lastSignIn)]));
+}
+function exportSurveys() {
+  const stores = new Map(raw.stores.map(s => [s.owner_id, s]));
+  const users = new Map(raw.users.map(u => [u.id, u]));
+  downloadCSV(`qareeb-survey-${isoDay(Date.now())}.csv`,
+    ['التاريخ', 'المحل', 'البريد', 'المدينة', 'كيف سمع عنّا', 'تفاصيل المصدر', 'نوع المحل', 'الزبائن يومياً', 'الأهداف', 'المكافأة الحالية'],
+    view().surveys.map(s => [isoDay(Date.parse(s.created_at)), (stores.get(s.owner_id) || {}).name || '', (users.get(s.owner_id) || {}).email || '', s.city || '',
+      LABELS.source[s.source] || s.source, s.source_detail || '', LABELS.business_type[s.business_type] || s.business_type || '',
+      LABELS.daily_customers[s.daily_customers] || s.daily_customers || '', (s.goals || []).map(g => LABELS.goals[g] || g).join(' + '),
+      LABELS.current_loyalty[s.current_loyalty] || s.current_loyalty || '']));
+}
+
+/* ---------- تلميح عند التمرير على أي عنصر data-tip ---------- */
+const tip = $('#tip');
+document.addEventListener('pointermove', e => {
+  const t = e.target.closest('[data-tip]');
+  if (!t) { tip.classList.remove('show'); return; }
+  tip.innerHTML = t.dataset.tip;
+  tip.classList.add('show');
+  const r = tip.getBoundingClientRect();
+  let x = e.clientX - r.width / 2, y = e.clientY - r.height - 14;
+  x = Math.max(8, Math.min(window.innerWidth - r.width - 8, x));
+  if (y < 8) y = e.clientY + 18;
+  tip.style.left = x + 'px'; tip.style.top = y + 'px';
+});
+document.addEventListener('pointerleave', () => tip.classList.remove('show'));
+
+/* ---------- الفلاتر والأزرار ---------- */
+$$('[data-range]').forEach(b => b.addEventListener('click', () => {
+  rangeDays = Number(b.dataset.range);
+  $$('[data-range]').forEach(x => x.setAttribute('aria-pressed', String(x === b)));
+  if (raw) render();
+}));
+$('#refresh').addEventListener('click', () => load().catch(err => { $('#updated').textContent = 'تعذّر التحديث'; console.error(err); }));
+$('#logout').addEventListener('click', async () => { await sb.auth.signOut(); raw = null; showGate('login'); });
+
+/* ---------- البداية ---------- */
+(async function boot() {
+  if (!sb) { showGate('login', 'تعذّر تحميل خدمة الحسابات. تأكد من الإنترنت وأعد التحميل.'); return; }
+  showGate('loading');
+  sb.auth.onAuthStateChange((ev, s) => setTimeout(() => { if (ev === 'SIGNED_IN' && s && !raw) open(s); }, 0));
+  const { data } = await sb.auth.getSession();
+  if (data.session) open(data.session); else showGate('login');
+})();
+</script>
+</body>
+</html>
