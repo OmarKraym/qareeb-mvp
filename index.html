@@ -518,6 +518,31 @@ td b{white-space:nowrap}
 .crm-src.demo{background:var(--line-2);color:var(--ink-3)}
 .qr-url a{color:var(--harbour);font-weight:700}
 @media (min-width:500px){.join{padding:30px 0}.join-card{min-height:auto;border-radius:20px;overflow:hidden;box-shadow:0 0 0 1px var(--line),0 20px 40px -24px rgba(7,45,54,.35)}}
+
+/* ---------- وضع القرب الحي (صفحة الزبون) ---------- */
+.live{margin-top:20px;display:flex;flex-direction:column;gap:12px}
+.live-intro,.live-status,.live-offer{border:1px solid var(--line);border-radius:16px;padding:16px;background:#fff}
+.live-intro b{display:block;font-size:17px;margin-bottom:4px}
+.live-intro p{margin:0 0 14px;color:var(--ink-2);font-size:14.5px}
+.live-row{display:flex;align-items:center;gap:10px;flex-wrap:wrap;font-size:15px}
+.live-dot{width:10px;height:10px;border-radius:50%;background:var(--line);flex:none}
+.live-dot.on{background:var(--mint);box-shadow:0 0 0 4px rgba(46,152,113,.18)}
+.live-dot.in{background:var(--saffron);box-shadow:0 0 0 4px rgba(226,162,58,.25)}
+.live-chip{margin-inline-start:auto;font-size:12.5px;font-weight:700;border-radius:999px;padding:2px 10px;background:var(--line-2);color:var(--ink-2)}
+.live-chip.in{background:var(--saffron);color:var(--harbour-deep)}
+.live-status small{display:block;color:var(--ink-3);font-size:12px;margin-top:6px}
+.live-offer{border:2px solid var(--saffron);text-align:center;background:#FFFBF2}
+.live-cd{position:relative;width:132px;height:132px;margin:10px auto 6px}
+.live-cd svg{width:100%;height:100%;transform:rotate(-90deg)}
+.live-cd .trk{fill:none;stroke:var(--line);stroke-width:8}
+.live-cd .bar{fill:none;stroke:var(--saffron);stroke-width:8;stroke-linecap:round;transition:stroke-dashoffset 1s linear}
+.live-cd .v{position:absolute;inset:0;display:grid;place-items:center;align-content:center}
+.live-cd .v b{font-size:30px;font-weight:800;line-height:1}
+.live-cd .v small{color:var(--ink-3);font-size:12px}
+.live-line{font-size:18px;font-weight:800;margin:6px 0 4px;line-height:1.5}
+.live-full{white-space:pre-wrap;color:var(--ink-2);font-size:13.5px;margin:0 0 14px;line-height:1.7}
+.live-redeem{background:var(--saffron);color:#2A1A02}
+.live-redeem:hover{background:#EBB252}
 @media (prefers-reduced-motion:reduce){
   *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}
 }
@@ -1199,7 +1224,7 @@ function renderLog() {
       skipped: e.reason === 'عرض نشط' ? 'لم يُرسل: عرض نشط' : 'لم يُرسل: غير مسجّل'
     }[s];
     const kind = e.type === 'offer' ? `<span class="tag ${e.kind}">${KIND_LABEL[e.kind]}</span>` : '—';
-    const channel = e.type === 'offer' ? (e.channel === 'push+wa' ? 'إشعار + واتساب' : 'إشعار فقط') : '—';
+    const channel = e.type === 'offer' ? (e.channel === 'live' ? 'زبون حقيقي (صفحة البطاقة)' : e.channel === 'push+wa' ? 'إشعار + واتساب' : 'إشعار فقط') : '—';
     return `<tr class="${e.id === freshLogId ? 'fresh' : ''}">
       <td class="num">${fmtTime(e.at)}</td>
       <td>${esc(e.name)}${e.phone ? `<br><small class="ltr num" style="color:var(--ink-3)">${esc(e.phone)}</small>` : ''}</td>
@@ -2300,6 +2325,7 @@ async function signOut() {
   clearTimeout(syncTimer);
   await flushStoreSync();
   if (custChannel) { sb.removeChannel(custChannel); custChannel = null; }
+  if (eventsChannel) { sb.removeChannel(eventsChannel); eventsChannel = null; }
   await sb.auth.signOut();
   authUser = null; storeRow = null; appReady = false;
   authNotice = '';
@@ -2378,6 +2404,8 @@ function startApp(row) {
   window.scrollTo(0, 0);
   refreshCustomers();   // الزبائن اللي سجّلوا من رمز QR
   watchCustomers();     // وتحديث لحظي لما ينضم زبون جديد
+  refreshEvents();      // تنبيهات القرب الحقيقية من صفحات البطاقات
+  watchEvents();
 }
 
 /* ---------- البداية ---------- */
@@ -2498,9 +2526,11 @@ function joinRender(view, msg = '') {
         </div>
         <p class="join-sub" style="margin:16px 0 0;text-align:center;font-weight:700;color:var(--ink)">اعرض هذا الرمز للكاشير في كل زيارة.</p>
         <p class="join-note">للرجوع لبطاقتك بسرعة: من قائمة المتصفح اختار «إضافة إلى الشاشة الرئيسية».</p>
+        <section class="live" id="live" aria-label="عروض القرب" aria-live="polite"></section>
         <button type="button" class="linkish" style="display:block;margin:18px auto 0" data-join="reset">مش أنت؟ سجّل برقم آخر</button>
       </div>
       <p class="join-foot">بواسطة قريب</p>`;
+    renderLive();
   }
 }
 
@@ -2518,7 +2548,16 @@ async function bootJoin() {
 
   const card = $('#joinCard');
   card.addEventListener('click', e => {
+    const lv = e.target.closest('[data-live]');
+    if (lv) {
+      if (lv.dataset.live === 'start') startLive();
+      if (lv.dataset.live === 'stop') stopLive();
+      if (lv.dataset.live === 'redeem') redeemLive(lv);
+      return;
+    }
     if (e.target.closest('[data-join="reset"]')) {
+      stopLive();
+      live.offer = null; live.done = null;
       localStorage.removeItem(PASS_KEY(JOIN_ID));
       joinPass = null;
       bootJoinLoad();
@@ -2556,16 +2595,17 @@ async function bootJoin() {
 async function bootJoinLoad() {
   joinRender('loading');
   try {
-    const saved = localStorage.getItem(PASS_KEY(JOIN_ID));
-    if (saved) {
-      const { data, error } = await withTimeout(sb.rpc('get_pass', { p_customer: saved }));
-      if (!error && data && data[0]) { joinPass = data[0]; joinRender('pass'); return; }
-      localStorage.removeItem(PASS_KEY(JOIN_ID));
-    }
+    // معلومات المحل أولاً (الموقع والنطاق والعروض) لأن وضع القرب يحتاجها
     const { data, error } = await withTimeout(sb.rpc('get_store_public', { p_store: JOIN_ID }));
     if (error) throw error;
     if (!data || !data[0]) { joinRender('error', 'هذا المحل غير موجود. ربما الرمز قديم.'); return; }
     joinStore = data[0];
+    const saved = localStorage.getItem(PASS_KEY(JOIN_ID));
+    if (saved) {
+      const { data: pd, error: pe } = await withTimeout(sb.rpc('get_pass', { p_customer: saved }));
+      if (!pe && pd && pd[0]) { joinPass = pd[0]; joinRender('pass'); restoreActiveOffer(); return; }
+      localStorage.removeItem(PASS_KEY(JOIN_ID));
+    }
     joinRender('form');
     if (window.innerWidth > 860) { const n = $('#j-name'); if (n) n.focus(); }
   } catch (err) {
@@ -2602,13 +2642,278 @@ function watchCustomers() {
       () => refreshCustomers(true))
     .subscribe();
 }
-window.addEventListener('focus', () => { if (appReady) refreshCustomers(true); });
+window.addEventListener('focus', () => { if (appReady) { refreshCustomers(true); refreshEvents(true); } });
 
 // حفظ عدد الزيارات للزبون الحقيقي في قاعدة البيانات
 async function pushVisits(c) {
   if (!c || !c.real || !sb) return;
   const { error } = await sb.from('customers').update({ visits: c.visits }).eq('id', c.id);
   if (error) toast('تعذّر حفظ الزيارة في الحساب. حاول مرة ثانية.');
+}
+
+
+/* =====================================================================
+   12) وضع القرب الحي في صفحة بطاقة الزبون
+   ---------------------------------------------------------------------
+   - الزبون يضغط «فعّل عروض القرب» ← نطلب إذن الموقع والإشعارات.
+   - نتابع الموقع (watchPosition) ما دامت الصفحة مفتوحة.
+   - نحسب المسافة محلياً بهافرساين للعرض فقط. القرار النهائي في الخادم
+     (report_proximity يعيد الحساب ويمنع التكرار ويكتشف تجمع الشلة).
+   - عند عرض جديد: إشعار على الهاتف عبر Service Worker + صوت + اهتزاز.
+   - حدود الويب: المتصفح يوقف الموقع لما تُقفل الشاشة أو تُغلق الصفحة.
+   ===================================================================== */
+const live = { on: false, watchId: null, d: null, acc: null, inside: false, offer: null, done: null, busy: false, lastReport: 0, wake: null, err: '' };
+let swReg = null;
+let liveAudio = null;
+
+const KIND_TAG = { quiet: 'ضيافة لحظية', busy: 'حالة الزحمة', group: 'تجمع الشلة' };
+
+function liveVars(o) {
+  const st = joinStore || {};
+  return {
+    customer_name: (joinPass.name || '').split(' ')[0],
+    store_name: st.name || joinPass.store_name,
+    store_status: STATUS_LABEL[st.status] || '',
+    distance: fmtMeters(o.distance != null ? o.distance : (live.d || 0)),
+    friend_name: o.friend_name ? o.friend_name.split(' ')[0] : 'صديقك',
+    offer_expiry: `${st.offer_minutes || 15} دقيقة (حتى ${fmtTime(Date.parse(o.expires_at))})`
+  };
+}
+function liveOfferText(o) {
+  const st = joinStore || {}, v = liveVars(o);
+  const offers = st.offers || {};
+  v.offer = fill(offers[o.kind] || '', v);
+  return { line: v.offer, full: fill(st.template || '{offer}', v) };
+}
+
+function renderLive() {
+  const box = $('#live');
+  if (!box || !joinPass) return;
+  const now = Date.now();
+  let html = '';
+  const o = live.offer && Date.parse(live.offer.expires_at) > now ? live.offer : null;
+
+  if (live.done) {
+    html += `<div class="offer-done" role="status">✓ تم استخدام العرض. صحتين! هذي زيارتك رقم ${live.done}.</div>`;
+  }
+  if (o) {
+    const t = liveOfferText(o);
+    const total = (joinStore && joinStore.offer_minutes ? joinStore.offer_minutes : 15) * 60000;
+    const C = 2 * Math.PI * 52;
+    html += `
+      <div class="live-offer" role="status">
+        <span class="tag ${o.kind}">${KIND_TAG[o.kind] || ''}</span>
+        <div class="live-cd">
+          <svg viewBox="0 0 120 120" aria-hidden="true"><circle class="trk" cx="60" cy="60" r="52"/><circle class="bar" cx="60" cy="60" r="52" stroke-dasharray="${C}" data-ring data-exp="${Date.parse(o.expires_at)}" data-total="${total}"/></svg>
+          <div class="v"><b class="num ltr" data-exp="${Date.parse(o.expires_at)}">${mmss(Date.parse(o.expires_at) - now)}</b><small>متبقي</small></div>
+        </div>
+        <p class="live-line">${esc(t.line)}</p>
+        <button type="button" class="btn btn-primary btn-block live-redeem" data-live="redeem">استخدم العرض الآن</button>
+        <p class="join-note">اضغط الزر قدام الكاشير.</p>
+      </div>`;
+  }
+  if (!live.on) {
+    html += `
+      <div class="live-intro">
+        <b>عروض لما تكون قريب</b>
+        <p>فعّل الموقع وخلي الصفحة مفتوحة. لما تقرب من ${esc((joinStore && joinStore.name) || joinPass.store_name)}، يوصلك عرض ضيافة فوري.</p>
+        ${live.err ? `<div class="form-err" role="alert">${esc(live.err)}</div>` : ''}
+        <button type="button" class="btn btn-primary btn-block" data-live="start">فعّل عروض القرب</button>
+      </div>`;
+  } else {
+    const rad = (joinStore && joinStore.radius) || 150;
+    const dTxt = live.d == null ? 'جاري تحديد موقعك...' : `تبعد عن المحل <b class="num">${fmtMeters(live.d)}</b>`;
+    html += `
+      <div class="live-status">
+        <div class="live-row">
+          <span class="live-dot ${live.d == null ? '' : (live.inside ? 'in' : 'on')}" aria-hidden="true"></span>
+          <span>${dTxt}</span>
+          <span class="live-chip ${live.inside ? 'in' : ''}">${live.inside ? 'داخل النطاق' : `النطاق ${rad} م`}</span>
+        </div>
+        ${live.acc ? `<small class="num">دقة الموقع ± ${Math.round(live.acc)} م</small>` : ''}
+        ${live.err ? `<div class="form-err" role="alert">${esc(live.err)}</div>` : ''}
+        <p class="join-note" style="text-align:start">خلي هذي الصفحة مفتوحة والشاشة شغّالة. المتصفح يوقف الموقع لما تقفل الشاشة.</p>
+        <button type="button" class="linkish" data-live="stop">إيقاف</button>
+      </div>`;
+  }
+  box.innerHTML = html;
+  tickLive();
+}
+
+function tickLive() {
+  const now = Date.now();
+  $$('#live [data-exp]').forEach(e => {
+    const left = Number(e.dataset.exp) - now;
+    if (e.hasAttribute('data-ring')) {
+      const C = 2 * Math.PI * 52;
+      e.style.strokeDashoffset = String(C * (1 - Math.max(0, left) / (Number(e.dataset.total) || 1)));
+    } else e.textContent = mmss(left);
+  });
+  if (live.offer && Date.parse(live.offer.expires_at) <= now) { live.offer = null; renderLive(); }
+}
+
+function liveChime() {
+  try {
+    liveAudio = liveAudio || new (window.AudioContext || window.webkitAudioContext)();
+    const t = liveAudio.currentTime;
+    [988, 1319].forEach((f, i) => {
+      const o = liveAudio.createOscillator(), g = liveAudio.createGain(), t0 = t + i * 0.15;
+      o.frequency.value = f;
+      g.gain.setValueAtTime(0.0001, t0);
+      g.gain.exponentialRampToValueAtTime(0.25, t0 + 0.02);
+      g.gain.exponentialRampToValueAtTime(0.0001, t0 + 0.4);
+      o.connect(g).connect(liveAudio.destination); o.start(t0); o.stop(t0 + 0.45);
+    });
+  } catch (e) { /* الصوت ممنوع */ }
+}
+
+async function notifyOffer(o) {
+  const t = liveOfferText(o);
+  const title = (joinStore && joinStore.name) || joinPass.store_name;
+  liveChime();
+  if (navigator.vibrate) navigator.vibrate([200, 100, 200]);
+  const box = $('#live .live-offer');
+  if (box) box.scrollIntoView({ behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth', block: 'center' });
+  document.title = '(1) عرض جديد — ' + title;
+  try {
+    if ('Notification' in window && Notification.permission === 'granted') {
+      const opts = { body: t.line, tag: 'qareeb-offer', renotify: true, requireInteraction: true, vibrate: [200, 100, 200], data: { url: location.href } };
+      if (swReg) await swReg.showNotification(title, opts);
+      else new Notification(title, opts);
+    }
+  } catch (e) { /* الإشعار غير مدعوم: العرض ظاهر في الصفحة */ }
+}
+
+async function reportPosition(lat, lng) {
+  if (live.busy) return;
+  live.busy = true;
+  live.lastReport = Date.now();
+  try {
+    const { data, error } = await withTimeout(sb.rpc('report_proximity', { p_customer: joinPass.customer_id, p_lat: lat, p_lng: lng }));
+    if (error) throw error;
+    const r = data && data[0];
+    if (r && r.event_id) {
+      const isNew = r.is_new && (!live.offer || live.offer.event_id !== r.event_id);
+      live.offer = { event_id: r.event_id, kind: r.kind, expires_at: r.expires_at, friend_name: r.friend_name, distance: r.distance };
+      live.done = null;
+      renderLive();
+      if (isNew) notifyOffer(live.offer);
+    }
+    live.err = '';
+  } catch (err) {
+    live.err = joinErrorText(err);
+    renderLive();
+  } finally { live.busy = false; }
+}
+
+function onLivePosition(p) {
+  const st = joinStore;
+  if (!st || st.lat == null) return;
+  const { latitude: lat, longitude: lng, accuracy } = p.coords;
+  const d = haversine(st.lat, st.lng, lat, lng);
+  const wasInside = live.inside;
+  live.d = d; live.acc = accuracy; live.inside = d <= st.radius; live.err = '';
+  const hasOffer = live.offer && Date.parse(live.offer.expires_at) > Date.now();
+  // نبلّغ الخادم عند الدخول، ثم كل 30 ثانية داخل النطاق لو ما فيش عرض
+  if (live.inside && !hasOffer && (!wasInside || Date.now() - live.lastReport > 30000)) reportPosition(lat, lng);
+  renderLive();
+}
+
+async function startLive() {
+  live.err = '';
+  if (!('geolocation' in navigator)) { live.err = 'هذا المتصفح ما يدعمش تحديد الموقع.'; renderLive(); return; }
+  if (!window.isSecureContext) { live.err = 'تحديد الموقع يحتاج رابط https.'; renderLive(); return; }
+  liveChime(); // يفتح الصوت بعد ضغطة المستخدم (الصوت يكون شبه صامت أول مرة)
+  try { if ('serviceWorker' in navigator) swReg = await navigator.serviceWorker.register('sw.js'); } catch (e) { swReg = null; }
+  try { if ('Notification' in window && Notification.permission === 'default') await Notification.requestPermission(); } catch (e) { /* */ }
+  await keepAwake();
+  live.on = true;
+  renderLive();
+  live.watchId = navigator.geolocation.watchPosition(onLivePosition, err => {
+    live.err = ({ 1: 'رفضت إذن الموقع. فعّله من إعدادات المتصفح للموقع هذا.', 2: 'تعذّر تحديد موقعك الآن. جرّب في مكان مفتوح.', 3: 'تحديد الموقع طوّل. نحاول من جديد...' })[err.code] || 'تعذّر تحديد الموقع.';
+    if (err.code === 1) stopLive(false);
+    renderLive();
+  }, { enableHighAccuracy: true, maximumAge: 3000, timeout: 20000 });
+}
+
+function stopLive(clearErr = true) {
+  if (live.watchId !== null) navigator.geolocation.clearWatch(live.watchId);
+  live.watchId = null; live.on = false; live.d = null; live.inside = false;
+  if (clearErr) live.err = '';
+  if (live.wake) { live.wake.release().catch(() => {}); live.wake = null; }
+  renderLive();
+}
+
+// إبقاء الشاشة شغّالة أثناء المشي (لو المتصفح يدعم)
+async function keepAwake() {
+  try { if ('wakeLock' in navigator) live.wake = await navigator.wakeLock.request('screen'); } catch (e) { live.wake = null; }
+}
+document.addEventListener('visibilitychange', () => {
+  if (document.visibilityState === 'visible') {
+    if (JOIN_ID) document.title = 'بطاقة الولاء — قريب';
+    if (live.on && !live.wake) keepAwake();
+  }
+});
+
+async function redeemLive(btn) {
+  if (!live.offer) return;
+  btn.disabled = true; btn.textContent = 'جاري التأكيد...';
+  try {
+    const { data, error } = await withTimeout(sb.rpc('redeem_proximity', { p_customer: joinPass.customer_id, p_event: live.offer.event_id }));
+    if (error) throw error;
+    const v = data && data[0] && data[0].visits;
+    joinPass.visits = v || joinPass.visits + 1;
+    live.offer = null; live.done = joinPass.visits;
+    joinRender('pass');
+  } catch (err) {
+    btn.disabled = false; btn.textContent = 'استخدم العرض الآن';
+    live.err = err && (err.message || '').includes('offer_not_active') ? 'العرض انتهى أو استُخدم من قبل.' : joinErrorText(err);
+    if ((err.message || '').includes('offer_not_active')) live.offer = null;
+    renderLive();
+  }
+}
+
+async function restoreActiveOffer() {
+  try {
+    const { data } = await withTimeout(sb.rpc('get_active_offer', { p_customer: joinPass.customer_id }));
+    const r = data && data[0];
+    if (r) {
+      live.offer = { event_id: r.event_id, kind: r.kind, expires_at: r.expires_at, friend_name: r.friend_name, distance: null };
+      renderLive();
+      const box = $('#live .live-offer'); if (box) box.scrollIntoView({ block: 'center' });
+    }
+  } catch (e) { /* نكمل بدون */ }
+}
+setInterval(() => { if (JOIN_ID && live.offer) tickLive(); }, 1000);
+
+/* ---------- تنبيهات القرب الحقيقية في سجل صاحب المحل ---------- */
+let eventsChannel = null;
+async function refreshEvents(announce = false) {
+  if (!storeRow || !appReady || !sb) return;
+  const since = new Date(Date.now() - 24 * 3600 * 1000).toISOString();
+  const { data, error } = await sb.from('proximity_events')
+    .select('id,kind,distance,created_at,expires_at,redeemed_at,customer_id,customer:customers!proximity_events_customer_id_fkey(name,phone),friend:customers!proximity_events_friend_customer_id_fkey(name)')
+    .eq('store_id', storeRow.id).gte('created_at', since).order('created_at', { ascending: false }).limit(100);
+  if (error || !data) return;
+  const known = new Set(state.log.filter(l => l.real).map(l => l.id));
+  const real = data.map(e => ({
+    id: e.id, type: 'offer', real: true, at: Date.parse(e.created_at), customerId: e.customer_id,
+    name: (e.customer && e.customer.name) || 'زبون', phone: (e.customer && e.customer.phone) || '',
+    kind: e.kind, distance: e.distance, expiresAt: Date.parse(e.expires_at), total: Date.parse(e.expires_at) - Date.parse(e.created_at),
+    redeemed: !!e.redeemed_at, channel: 'live', friendName: e.friend && e.friend.name
+  }));
+  if (announce) real.filter(r => !known.has(r.id)).forEach(r => toast(`زبون حقيقي قريب من المحل الآن: ${r.name}`));
+  state.log = [...real, ...state.log.filter(l => !l.real)].sort((a, b) => b.at - a.at).slice(0, 80);
+  save();
+  renderLog(); renderStats();
+}
+function watchEvents() {
+  if (eventsChannel) { sb.removeChannel(eventsChannel); eventsChannel = null; }
+  if (!storeRow) return;
+  eventsChannel = sb.channel('events-' + storeRow.id)
+    .on('postgres_changes', { event: '*', schema: 'public', table: 'proximity_events', filter: `store_id=eq.${storeRow.id}` },
+      () => { refreshEvents(true); refreshCustomers(); })
+    .subscribe();
 }
 
 bootAuth();
