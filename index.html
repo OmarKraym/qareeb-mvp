@@ -1793,6 +1793,7 @@ const AUTH_VIEWS = {
     <p class="sub">ادخل للوحة تحكم محلك.</p>
     ${authNotice ? `<div class="form-err" role="alert">${esc(authNotice)}</div>` : ''}
     <button type="button" class="btn-google" data-act="google">${GOOGLE_SVG}الدخول بحساب Google</button>
+    <div class="form-err" data-google-err role="alert" style="margin:8px 0 0"></div>
     <div class="or">أو بالبريد</div>
     <form id="fLogin" novalidate>
       ${emailField(lastEmail)}
@@ -1810,6 +1811,7 @@ const AUTH_VIEWS = {
     <h2>أنشئ حساب محلك</h2>
     <p class="sub">مجاني للتجربة. ما يحتاجش بطاقة دفع.</p>
     <button type="button" class="btn-google" data-act="google">${GOOGLE_SVG}التسجيل بحساب Google</button>
+    <div class="form-err" data-google-err role="alert" style="margin:8px 0 0"></div>
     <div class="or">أو بالبريد</div>
     <form id="fSignup" novalidate>
       <div class="field">
@@ -1923,7 +1925,8 @@ const validEmail = v => /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v);
 /* ---------- الدخول بحساب Google ---------- */
 let googleEnabled = null;
 async function googleSignIn(card) {
-  const err = card.querySelector('.form-err') || card.querySelector('form .form-err');
+  const err = card.querySelector('[data-google-err]');
+  if (err) err.textContent = '';
   try {
     if (googleEnabled === null) {
       const r = await fetch(SB_URL + '/auth/v1/settings', { headers: { apikey: SB_KEY } });
