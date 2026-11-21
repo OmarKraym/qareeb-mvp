@@ -393,12 +393,139 @@ td b{white-space:nowrap}
   .status-switch button{padding:7px 11px;font-size:13.5px}
   .phone{transform:scale(.92);transform-origin:top center;margin-bottom:-55px}
 }
+
+/* =========================================================
+   شاشات الحساب: الدخول، إنشاء الحساب، تجهيز المحل، الاستبيان
+   ========================================================= */
+[hidden]{display:none!important}
+.auth{min-height:100vh;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.1fr);background:var(--paper)}
+.auth-brand{
+  background:var(--harbour-deep);color:#E6EEEC;padding:40px 48px;display:flex;flex-direction:column;
+  position:relative;overflow:hidden;
+}
+.auth-brand .brand b{color:#fff}
+.auth-brand .brand small{color:#9FB6B5}
+.auth-brand h1{font-size:40px;line-height:1.25;font-weight:800;margin:auto 0 14px;max-width:13ch;color:#fff;position:relative;z-index:1}
+.auth-brand p{font-size:17px;color:#B9CCCB;max-width:36ch;margin:0 0 28px;position:relative;z-index:1}
+.auth-points{list-style:none;margin:0 0 auto;padding:0;display:flex;flex-direction:column;gap:10px;position:relative;z-index:1}
+.auth-points li{display:flex;gap:10px;align-items:center;font-size:15px}
+.auth-points li::before{content:"";width:8px;height:8px;border-radius:50%;background:var(--saffron);flex:none}
+.auth-rings{position:absolute;left:-180px;bottom:-180px;width:560px;height:560px;opacity:.9;pointer-events:none}
+.auth-rings circle{fill:none;stroke:rgba(255,255,255,.08)}
+.auth-rings .f{stroke:var(--saffron);stroke-opacity:.55;stroke-width:2;fill:rgba(226,162,58,.06)}
+.auth-main{display:flex;align-items:center;justify-content:center;padding:40px 24px}
+.auth-card{width:100%;max-width:420px}
+.auth-card.wide{max-width:560px}
+.auth-card h2{font-size:28px;font-weight:800;margin:0 0 4px;line-height:1.3}
+.auth-card .sub{color:var(--ink-2);margin:0 0 24px;font-size:15px}
+.auth-card .field{margin-bottom:14px}
+.auth-card .input{padding:11px 13px;font-size:15.5px}
+.pw-wrap{position:relative}
+.pw-wrap .input{padding-left:70px}
+.pw-toggle{position:absolute;left:6px;top:50%;transform:translateY(-50%);border:0;background:none;color:var(--harbour);font-size:13px;font-weight:700;padding:6px 8px}
+.btn-block{width:100%;padding:12px;font-size:16px;border-radius:10px}
+.btn[disabled]{opacity:.6;cursor:progress}
+.btn-google{
+  width:100%;display:flex;align-items:center;justify-content:center;gap:10px;background:#fff;border:1px solid var(--line);
+  border-radius:10px;padding:11px;font-weight:700;font-size:15px;
+}
+.btn-google:hover{background:var(--limestone)}
+.btn-google svg{width:18px;height:18px}
+.or{display:flex;align-items:center;gap:12px;color:var(--ink-3);font-size:13px;margin:18px 0}
+.or::before,.or::after{content:"";flex:1;height:1px;background:var(--line)}
+.row-between{display:flex;justify-content:space-between;align-items:center;gap:10px;margin:4px 0 16px;flex-wrap:wrap}
+.check{display:flex;align-items:center;gap:8px;font-size:14px;cursor:pointer}
+.check input{width:17px;height:17px;accent-color:var(--harbour)}
+.linkish{border:0;background:none;padding:0;color:var(--harbour);font-weight:700;font-size:14px;text-decoration:underline;text-underline-offset:3px}
+.switch{text-align:center;color:var(--ink-2);margin:22px 0 0;font-size:14.5px}
+.form-err{color:var(--pepper);font-size:14px;min-height:1.3em;margin-bottom:8px}
+.form-ok{background:var(--mint-soft);color:#1E5E46;border-radius:10px;padding:12px 14px;font-size:14.5px;margin-bottom:14px}
+.field-err{color:var(--pepper);font-size:12.5px;min-height:1em}
+.input[aria-invalid="true"]{border-color:var(--pepper)}
+.steps-line{display:flex;align-items:center;gap:8px;color:var(--ink-3);font-size:13.5px;margin-bottom:10px}
+.auth-loading{text-align:center;color:var(--ink-2)}
+.spinner{display:inline-block;width:34px;height:34px;border-radius:50%;border:3px solid var(--line);border-top-color:var(--harbour);animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.mail-icon{width:56px;height:56px;border-radius:16px;background:var(--saffron-soft);color:var(--saffron-ink);display:grid;place-items:center;margin-bottom:16px}
+
+/* ---------- الاستبيان ---------- */
+.sv-progress{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;margin:0 0 22px}
+.sv-progress span{height:5px;border-radius:999px;background:var(--line-2);transition:background .3s var(--ease)}
+.sv-progress span.on{background:var(--saffron)}
+.sv-meta{display:flex;justify-content:space-between;align-items:center;color:var(--ink-3);font-size:13.5px;margin-bottom:6px}
+.sv-q{font-size:26px;font-weight:800;line-height:1.35;margin:0 0 6px}
+.sv-hint{color:var(--ink-2);margin:0 0 18px;font-size:14.5px}
+.sv-opts{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.sv-opt{
+  text-align:start;border:1.5px solid var(--line);background:#fff;border-radius:12px;padding:13px 14px;font-weight:700;font-size:15px;
+  display:flex;align-items:center;gap:10px;transition:border-color .15s,background .15s,transform .1s;
+}
+.sv-opt:hover{border-color:var(--harbour-2)}
+.sv-opt:active{transform:scale(.99)}
+.sv-opt .box{width:20px;height:20px;border-radius:50%;border:2px solid var(--line);flex:none;display:grid;place-items:center;transition:all .15s}
+.sv-opts.multi .sv-opt .box{border-radius:6px}
+.sv-opt[aria-pressed="true"]{border-color:var(--harbour);background:#EEF5F5}
+.sv-opt[aria-pressed="true"] .box{border-color:var(--harbour);background:var(--harbour)}
+.sv-opt[aria-pressed="true"] .box::after{content:"";width:8px;height:8px;border-radius:50%;background:#fff}
+.sv-opts.multi .sv-opt[aria-pressed="true"] .box::after{width:10px;height:5px;border-radius:0;background:none;border:2px solid #fff;border-top:0;border-right:0;transform:rotate(-45deg) translate(1px,-1px)}
+.sv-opt[aria-disabled="true"]{opacity:.45}
+.sv-follow{margin-top:14px}
+.sv-nav{display:flex;justify-content:space-between;align-items:center;margin-top:24px;gap:12px}
+.sv-nav .btn-primary{min-width:140px;padding:11px 18px;font-size:15.5px;border-radius:10px}
+.sv-anim{animation:svIn .35s var(--ease) both}
+@keyframes svIn{from{opacity:0;transform:translateX(-14px)}to{opacity:1;transform:none}}
+
+/* ---------- حساب صاحب المحل في الشريط العلوي ---------- */
+.acct{display:flex;align-items:center;gap:10px;font-size:13.5px}
+.acct-name{font-weight:700;color:var(--ink-2);max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.sync{font-size:12.5px;color:var(--ink-3);display:flex;align-items:center;gap:6px}
+.sync::before{content:"";width:7px;height:7px;border-radius:50%;background:var(--mint)}
+.sync.saving::before{background:var(--saffron)}
+.sync.error{color:var(--pepper)}
+.sync.error::before{background:var(--pepper)}
+
+@media (max-width:860px){
+  .auth{grid-template-columns:1fr}
+  .auth-brand{padding:20px 22px 22px}
+  .auth-brand h1{font-size:24px;margin:18px 0 6px;max-width:none}
+  .auth-brand p{font-size:14.5px;margin:0}
+  .auth-points,.auth-rings{display:none}
+  .auth-main{align-items:flex-start;padding:26px 18px 40px}
+  .sv-opts{grid-template-columns:1fr}
+  .sv-q{font-size:22px}
+  .acct-name,.sync{display:none}
+}
+
 @media (prefers-reduced-motion:reduce){
   *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}
 }
 </style>
 </head>
 <body data-view="merchant">
+<!-- =================== شاشات الحساب =================== -->
+<div class="auth" id="auth">
+  <aside class="auth-brand">
+    <div class="brand">
+      <svg viewBox="0 0 36 36" aria-hidden="true"><circle cx="18" cy="18" r="16" fill="none" stroke="#9FB6B5" stroke-width="2" opacity=".5"/><circle cx="18" cy="18" r="10" fill="none" stroke="#E2A23A" stroke-width="2.4"/><circle cx="18" cy="18" r="3.6" fill="#fff"/></svg>
+      <div><b>قريب</b><small>ولاء وضيافة حسب القرب</small></div>
+    </div>
+    <h1>زبونك قريب؟ رحّب بيه قبل ما يفوت.</h1>
+    <p>بطاقات ولاء رقمية، وعروض ضيافة توصل للزبون على هاتفه وواتساب وهو ماشي جنب محلك.</p>
+    <ul class="auth-points">
+      <li>رمز QR واحد على الطاولة يسجّل الزبون في ثوانٍ</li>
+      <li>عرض ضيافة لحظي لما يكون المحل هادئ</li>
+      <li>رسالة طلب مسبق لما يكون المحل زحمة</li>
+    </ul>
+    <svg class="auth-rings" viewBox="-280 -280 560 560" aria-hidden="true">
+      <circle r="270"/><circle r="200"/><circle r="130"/><circle class="f" r="70"/>
+    </svg>
+  </aside>
+  <main class="auth-main">
+    <div class="auth-card" id="authCard" aria-live="polite"></div>
+  </main>
+</div>
+
+<div id="app" hidden>
 
 <header class="topbar" id="topbar">
   <div class="brand">
@@ -411,6 +538,11 @@ td b{white-space:nowrap}
     <button type="button" role="radio" data-status="busy" aria-checked="false">زحمة</button>
   </div>
   <button type="button" class="btn-quiet" id="resetBtn">مسح بيانات العرض</button>
+  <div class="acct">
+    <span class="sync" id="syncState" role="status"></span>
+    <span class="acct-name" id="acctName"></span>
+    <button type="button" class="btn-quiet" id="logoutBtn">تسجيل الخروج</button>
+  </div>
 </header>
 
 <nav class="view-tabs" role="tablist" aria-label="التبديل بين الواجهتين">
@@ -574,8 +706,12 @@ td b{white-space:nowrap}
     </div>
   </aside>
 </main>
+</div>
 
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<!-- مكتبة Supabase للحسابات وقاعدة البيانات -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.119.2/dist/umd/supabase.js"></script>
 
 <!-- مكتبة توليد رمز QR (qrcode-generator 1.4.4 — رخصة MIT — Kazuhiko Arase) مضمّنة لتعمل بدون إنترنت -->
 <script>
@@ -677,7 +813,7 @@ function bearingBetween(lat1, lon1, lat2, lon2) {
    - phone:     حالة هاتف الزبون (الشاشة الحالية، الزبون المسجّل، رسائل واتساب)
    كل تعديل يمر عبر commit() التي تحفظ ثم تعيد الرسم.
    ===================================================================== */
-const LS_KEY = 'qareeb.mvp.v1';
+let LS_KEY = 'qareeb.mvp.v1'; // يتغيّر لكل حساب بعد الدخول
 
 const DEFAULT_TEMPLATE =
   'مرحبا {customer_name} 👋\n' +
@@ -734,12 +870,13 @@ function load() {
   return s;
 }
 
-let state = load();
+let state = defaultState();
 let saveTimer = null;
 
 function save() {
   clearTimeout(saveTimer);
   try { localStorage.setItem(LS_KEY, JSON.stringify(state)); } catch (e) { /* ممتلئ أو محظور */ }
+  queueStoreSync(); // إعدادات المحل تُرفع لحسابك
 }
 // حفظ مؤجل أثناء السحب السريع للشريط لتخفيف الكتابة
 function saveSoon() { clearTimeout(saveTimer); saveTimer = setTimeout(save, 300); }
@@ -1429,13 +1566,15 @@ function bindMerchant() {
   });
 
   $('#resetBtn').addEventListener('click', () => {
-    if (!confirm('مسح كل الزبائن والسجل والإعدادات والرجوع للبيانات التجريبية؟')) return;
+    if (!confirm('مسح زبائن المحاكاة والسجل والرجوع للبيانات التجريبية؟ إعدادات محلك ما تتغيّرش.')) return;
     if (watchId !== null) navigator.geolocation.clearWatch(watchId);
     watchId = null;
     localStorage.removeItem(LS_KEY);
+    const keepStore = state.store; // إعدادات المحل تبقى، نمسح بيانات المحاكاة فقط
     state = defaultState();
+    state.store = keepStore;
     save(); fillInputs(); render(); renderPhone(true);
-    toast('رجعنا للبيانات التجريبية.');
+    toast('مسحنا بيانات المحاكاة. إعدادات محلك باقية.');
   });
 }
 
@@ -1548,7 +1687,7 @@ window.addEventListener('resize', syncTopH);
 /* ---------- مزامنة بين التبويبات ----------
    افتح الصفحة في تبويبين (واحد للكاشير وواحد كهاتف)، وأي تغيير يظهر في الآخر. */
 window.addEventListener('storage', e => {
-  if (e.key !== LS_KEY) return;
+  if (!appReady || e.key !== LS_KEY) return;
   const gps = state.sim.gps, gpsPos = state.sim.gpsPos;
   state = load();
   state.sim.gps = gps; state.sim.gpsPos = gpsPos;
@@ -1557,21 +1696,637 @@ window.addEventListener('storage', e => {
 
 /* ---------- نبضة كل ثانية: العدادات، حالة العروض، الساعة ---------- */
 setInterval(() => {
+  if (!appReady) return;
   updateCountdowns();
   renderLog();
   renderStats();
   renderPhone();
 }, 1000);
 
-/* ---------- البدء ---------- */
-renderChips();
-fillInputs();
-bindMerchant();
-bindPhone();
-bindSim();
-state.sim.inside = measure().inside;
-render();
-syncTopH();
+
+/* =====================================================================
+   9) حسابات أصحاب المحلات (Supabase Auth)
+   ---------------------------------------------------------------------
+   - إنشاء حساب بالبريد وكلمة السر، أو الدخول بحساب Google.
+   - "تذكّرني": الجلسة تُحفظ في localStorage فتبقى بعد إغلاق المتصفح.
+     بدونها تُحفظ في sessionStorage وتنتهي بإغلاق المتصفح.
+   - أي جهاز جديد ما فيه جلسة ← تظهر شاشة الدخول أو إنشاء حساب.
+   - حساب جديد ← تجهيز المحل ← استبيان قصير ← لوحة التحكم.
+   - إعدادات المحل (الاسم، النطاق، الرسائل...) تُحفظ في جدول stores
+     فتظهر نفسها من أي جهاز. الحماية بسياسات RLS: كل صاحب محل يرى محله فقط.
+   ===================================================================== */
+const SB_URL = 'https://civyggmjqefqzofnfqqc.supabase.co';
+const SB_KEY = 'sb_publishable_iTKRPpH03PyEj1JoWVfX0A_eriEbKCs'; // مفتاح عام مخصص للمتصفح
+const REMEMBER_KEY = 'qareeb.remember';
+const APP_URL = location.origin + location.pathname;
+
+// تخزين الجلسة حسب اختيار "تذكّرني"
+const sessionStore = {
+  pick() { return localStorage.getItem(REMEMBER_KEY) === '0' ? sessionStorage : localStorage; },
+  getItem(k) { return this.pick().getItem(k); },
+  setItem(k, v) { this.pick().setItem(k, v); },
+  removeItem(k) { localStorage.removeItem(k); sessionStorage.removeItem(k); }
+};
+
+let sb = null;
+try {
+  if (window.supabase && window.supabase.createClient) {
+    sb = window.supabase.createClient(SB_URL, SB_KEY, {
+      auth: { storage: sessionStore, persistSession: true, autoRefreshToken: true, detectSessionInUrl: true }
+    });
+  }
+} catch (e) { sb = null; }
+
+let authUser = null;     // المستخدم الحالي
+let storeRow = null;     // صف المحل من قاعدة البيانات
+let entering = false;
+let appReady = false;
+let authNotice = '';     // رسالة تظهر في شاشة الدخول (مثلاً خطأ قادم من Google)
+
+const CITIES = ['طرابلس', 'بنغازي', 'مصراتة', 'الزاوية', 'زليتن', 'الخمس', 'صبراتة', 'غريان', 'سبها', 'البيضاء', 'طبرق', 'درنة', 'سرت', 'أخرى'];
+
+// ترجمة أخطاء Supabase الشائعة إلى رسائل واضحة
+function authErrorText(err) {
+  if (!err) return '';
+  const code = err.code || '', msg = (err.message || '').toLowerCase();
+  if (code === 'invalid_credentials' || msg.includes('invalid login')) return 'البريد أو كلمة السر غير صحيحة.';
+  if (code === 'email_not_confirmed' || msg.includes('not confirmed')) return 'بريدك لسه ما تأكدش. افتح رابط التفعيل اللي وصلك، أو اطلب رابط جديد.';
+  if (code === 'user_already_exists' || msg.includes('already registered')) return 'هذا البريد عنده حساب. ادخل بدل إنشاء حساب جديد.';
+  if (code === 'weak_password' || msg.includes('password should')) return 'كلمة السر ضعيفة. استخدم 8 أحرف على الأقل.';
+  if (code.startsWith('over_') || err.status === 429 || msg.includes('rate limit')) return 'محاولات كثيرة. استنى دقيقة وحاول مرة ثانية.';
+  if (msg.includes('fetch') || msg.includes('network')) return 'تعذّر الاتصال بالخادم. تأكد من الإنترنت وحاول مرة ثانية.';
+  if (code === 'same_password') return 'كلمة السر الجديدة لازم تكون مختلفة عن القديمة.';
+  return 'صار خطأ غير متوقع: ' + (err.message || 'حاول مرة ثانية.');
+}
+
+const GOOGLE_SVG = `<svg viewBox="0 0 48 48" aria-hidden="true"><path fill="#FFC107" d="M43.6 20.5H42V20H24v8h11.3C33.7 32.7 29.2 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.8 1.2 7.9 3.1l5.7-5.7C34 6.1 29.3 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20 20-8.9 20-20c0-1.3-.1-2.4-.4-3.5z"/><path fill="#FF3D00" d="m6.3 14.7 6.6 4.8C14.7 15.1 19 12 24 12c3.1 0 5.8 1.2 7.9 3.1l5.7-5.7C34 6.1 29.3 4 24 4 16.3 4 9.7 8.3 6.3 14.7z"/><path fill="#4CAF50" d="M24 44c5.2 0 9.9-2 13.4-5.2l-6.2-5.2C29.2 35.1 26.7 36 24 36c-5.2 0-9.6-3.3-11.3-7.9l-6.5 5C9.5 39.6 16.2 44 24 44z"/><path fill="#1976D2" d="M43.6 20.5H42V20H24v8h11.3c-.8 2.2-2.2 4.2-4.1 5.6l6.2 5.2C37 39.2 44 34 44 24c0-1.3-.1-2.4-.4-3.5z"/></svg>`;
+
+const pwField = (name, label, auto, hint = '') => `
+  <div class="field">
+    <label for="f-${name}">${label}</label>
+    <div class="pw-wrap">
+      <input class="input ltr" style="display:block;text-align:right" id="f-${name}" name="${name}" type="password" autocomplete="${auto}" minlength="8" required>
+      <button type="button" class="pw-toggle" data-pw="f-${name}" aria-label="إظهار كلمة السر">إظهار</button>
+    </div>
+    ${hint ? `<span class="hint" style="color:var(--ink-3);font-size:12.5px">${hint}</span>` : ''}
+    <div class="field-err" data-err="${name}"></div>
+  </div>`;
+const emailField = (value = '') => `
+  <div class="field">
+    <label for="f-email">البريد الإلكتروني</label>
+    <input class="input ltr" style="display:block;text-align:right" id="f-email" name="email" type="email" autocomplete="email" inputmode="email" placeholder="name@example.com" value="${esc(value)}" required>
+    <div class="field-err" data-err="email"></div>
+  </div>`;
+
+let lastEmail = '';
+
+const AUTH_VIEWS = {
+  loading: () => `<div class="auth-loading"><span class="spinner" aria-hidden="true"></span><p>جاري التحميل...</p></div>`,
+
+  offline: () => `
+    <h2>تعذّر تحميل خدمة الحسابات</h2>
+    <p class="sub">الصفحة تحتاج إنترنت للدخول لحسابك. تأكد من الاتصال ثم أعد التحميل.</p>
+    <button type="button" class="btn btn-primary btn-block" data-act="reload">إعادة التحميل</button>`,
+
+  login: () => `
+    <h2>أهلاً من جديد</h2>
+    <p class="sub">ادخل للوحة تحكم محلك.</p>
+    ${authNotice ? `<div class="form-err" role="alert">${esc(authNotice)}</div>` : ''}
+    <button type="button" class="btn-google" data-act="google">${GOOGLE_SVG}الدخول بحساب Google</button>
+    <div class="or">أو بالبريد</div>
+    <form id="fLogin" novalidate>
+      ${emailField(lastEmail)}
+      ${pwField('password', 'كلمة السر', 'current-password')}
+      <div class="row-between">
+        <label class="check"><input type="checkbox" name="remember" ${localStorage.getItem(REMEMBER_KEY) === '0' ? '' : 'checked'}> تذكّرني على هذا الجهاز</label>
+        <button type="button" class="linkish" data-go="forgot">نسيت كلمة السر؟</button>
+      </div>
+      <div class="form-err" role="alert"></div>
+      <button class="btn btn-primary btn-block" type="submit">دخول</button>
+    </form>
+    <p class="switch">ما عندكش حساب؟ <button type="button" class="linkish" data-go="signup">أنشئ حساب جديد</button></p>`,
+
+  signup: () => `
+    <h2>أنشئ حساب محلك</h2>
+    <p class="sub">مجاني للتجربة. ما يحتاجش بطاقة دفع.</p>
+    <button type="button" class="btn-google" data-act="google">${GOOGLE_SVG}التسجيل بحساب Google</button>
+    <div class="or">أو بالبريد</div>
+    <form id="fSignup" novalidate>
+      <div class="field">
+        <label for="f-owner">اسمك</label>
+        <input class="input" id="f-owner" name="owner" autocomplete="name" maxlength="60" required>
+        <div class="field-err" data-err="owner"></div>
+      </div>
+      ${emailField(lastEmail)}
+      ${pwField('password', 'كلمة السر', 'new-password', '8 أحرف على الأقل.')}
+      <div class="form-err" role="alert"></div>
+      <button class="btn btn-primary btn-block" type="submit">إنشاء الحساب</button>
+    </form>
+    <p class="switch">عندك حساب؟ <button type="button" class="linkish" data-go="login">ادخل</button></p>`,
+
+  checkEmail: () => `
+    <div class="mail-icon" aria-hidden="true"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg></div>
+    <h2>أكّد بريدك</h2>
+    <p class="sub">أرسلنا رابط تفعيل إلى <b class="ltr">${esc(lastEmail)}</b>. افتحه، وترجع هنا مباشرة لتجهيز محلك. لو ما لقيتهش، شوف مجلد الرسائل غير المرغوبة.</p>
+    <div class="form-err" role="alert"></div>
+    <button type="button" class="btn btn-line btn-block" data-act="resend">أرسل الرابط مرة ثانية</button>
+    <p class="switch"><button type="button" class="linkish" data-go="login">رجوع لتسجيل الدخول</button></p>`,
+
+  forgot: () => `
+    <h2>نسيت كلمة السر؟</h2>
+    <p class="sub">اكتب بريدك ونرسلك رابط لتعيين كلمة سر جديدة.</p>
+    <form id="fForgot" novalidate>
+      ${emailField(lastEmail)}
+      <div class="form-err" role="alert"></div>
+      <button class="btn btn-primary btn-block" type="submit">أرسل الرابط</button>
+    </form>
+    <p class="switch"><button type="button" class="linkish" data-go="login">رجوع لتسجيل الدخول</button></p>`,
+
+  reset: () => `
+    <h2>كلمة سر جديدة</h2>
+    <p class="sub">اختار كلمة سر جديدة لحسابك.</p>
+    <form id="fReset" novalidate>
+      ${pwField('password', 'كلمة السر الجديدة', 'new-password', '8 أحرف على الأقل.')}
+      <div class="form-err" role="alert"></div>
+      <button class="btn btn-primary btn-block" type="submit">حفظ والدخول</button>
+    </form>`,
+
+  store: () => {
+    const meta = (authUser && authUser.user_metadata) || {};
+    const owner = meta.owner_name || meta.full_name || meta.name || '';
+    return `
+    <div class="steps-line">الخطوة 1 من 2</div>
+    <h2>خلّينا نجهّز محلك</h2>
+    <p class="sub">هذي المعلومات تظهر للزبون في البطاقة والرسائل. تقدر تغيّرها بعدين.</p>
+    <form id="fStore" novalidate>
+      <div class="field">
+        <label for="f-owner">اسمك</label>
+        <input class="input" id="f-owner" name="owner" autocomplete="name" maxlength="60" value="${esc(owner)}" required>
+        <div class="field-err" data-err="owner"></div>
+      </div>
+      <div class="field">
+        <label for="f-store">اسم المحل</label>
+        <input class="input" id="f-store" name="store" maxlength="60" placeholder="مثلاً: مقهى السرايا" required>
+        <div class="field-err" data-err="store"></div>
+      </div>
+      <div class="field">
+        <label for="f-city">المدينة</label>
+        <select class="input" id="f-city" name="city" required>
+          <option value="">اختار المدينة</option>
+          ${CITIES.map(c => `<option>${c}</option>`).join('')}
+        </select>
+        <div class="field-err" data-err="city"></div>
+      </div>
+      <div class="form-err" role="alert"></div>
+      <button class="btn btn-primary btn-block" type="submit">التالي</button>
+    </form>
+    <p class="switch"><button type="button" class="linkish" data-act="logout">تسجيل الخروج</button></p>`;
+  },
+
+  survey: () => surveyView()
+};
+
+let authView = 'loading';
+function showAuth(view) {
+  authView = view;
+  appReady = false;
+  $('#app').hidden = true;
+  $('#auth').hidden = false;
+  const card = $('#authCard');
+  card.classList.toggle('wide', view === 'survey');
+  card.innerHTML = AUTH_VIEWS[view]();
+  const first = [...card.querySelectorAll('input:not([type=checkbox]), select')].find(i => !i.value);
+  if (first && view !== 'survey' && window.innerWidth > 860) first.focus();
+}
+
+function setBusy(form, busy, label) {
+  const btn = form.querySelector('button[type=submit]');
+  if (!btn) return;
+  if (busy) { btn.dataset.label = btn.textContent; btn.textContent = label; btn.disabled = true; }
+  else { btn.textContent = btn.dataset.label || btn.textContent; btn.disabled = false; }
+}
+function formError(form, text) { const e = form.querySelector('.form-err'); if (e) e.textContent = text || ''; }
+function fieldErrors(form, errs) {
+  let firstBad = null;
+  form.querySelectorAll('[data-err]').forEach(box => {
+    const name = box.dataset.err, msg = errs[name] || '';
+    box.textContent = msg;
+    const input = form.elements[name];
+    if (input) input.setAttribute('aria-invalid', msg ? 'true' : 'false');
+    if (msg && !firstBad) firstBad = input;
+  });
+  if (firstBad) firstBad.focus();
+  return !firstBad;
+}
+const validEmail = v => /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v);
+
+/* ---------- الدخول بحساب Google ---------- */
+let googleEnabled = null;
+async function googleSignIn(card) {
+  const err = card.querySelector('.form-err') || card.querySelector('form .form-err');
+  try {
+    if (googleEnabled === null) {
+      const r = await fetch(SB_URL + '/auth/v1/settings', { headers: { apikey: SB_KEY } });
+      const s = await r.json();
+      googleEnabled = !!(s.external && s.external.google);
+    }
+  } catch (e) { googleEnabled = null; }
+  if (googleEnabled === false) {
+    if (err) err.textContent = 'الدخول بحساب Google غير مفعّل بعد. استخدم البريد وكلمة السر الآن.';
+    return;
+  }
+  const remember = card.querySelector('input[name=remember]');
+  localStorage.setItem(REMEMBER_KEY, remember && !remember.checked ? '0' : '1');
+  const { error } = await sb.auth.signInWithOAuth({ provider: 'google', options: { redirectTo: APP_URL } });
+  if (error && err) err.textContent = authErrorText(error);
+}
+
+/* ---------- أحداث شاشات الحساب ---------- */
+function bindAuth() {
+  const card = $('#authCard');
+
+  card.addEventListener('click', async e => {
+    const go = e.target.closest('[data-go]');
+    if (go) {
+      const email = card.querySelector('input[name=email]');
+      if (email) lastEmail = email.value.trim();
+      authNotice = '';
+      showAuth(go.dataset.go);
+      return;
+    }
+    const pw = e.target.closest('[data-pw]');
+    if (pw) {
+      const input = $('#' + pw.dataset.pw);
+      const show = input.type === 'password';
+      input.type = show ? 'text' : 'password';
+      pw.textContent = show ? 'إخفاء' : 'إظهار';
+      pw.setAttribute('aria-label', show ? 'إخفاء كلمة السر' : 'إظهار كلمة السر');
+      return;
+    }
+    const act = e.target.closest('[data-act]');
+    if (!act) return;
+    if (act.dataset.act === 'reload') location.reload();
+    if (act.dataset.act === 'google') googleSignIn(card);
+    if (act.dataset.act === 'logout') signOut();
+    if (act.dataset.act === 'resend') {
+      act.disabled = true;
+      const { error } = await sb.auth.resend({ type: 'signup', email: lastEmail, options: { emailRedirectTo: APP_URL } });
+      card.querySelector('.form-err').textContent = error ? authErrorText(error) : '';
+      if (!error) act.textContent = 'تم الإرسال. شوف بريدك';
+      setTimeout(() => { act.disabled = false; }, 30000);
+    }
+  });
+
+  card.addEventListener('submit', async e => {
+    e.preventDefault();
+    const f = e.target;
+    formError(f, '');
+
+    if (f.id === 'fLogin') {
+      const email = f.email.value.trim(), password = f.password.value;
+      if (!fieldErrors(f, { email: validEmail(email) ? '' : 'اكتب بريد صحيح.', password: password ? '' : 'اكتب كلمة السر.' })) return;
+      lastEmail = email;
+      localStorage.setItem(REMEMBER_KEY, f.remember.checked ? '1' : '0');
+      setBusy(f, true, 'جاري الدخول...');
+      const { data, error } = await sb.auth.signInWithPassword({ email, password });
+      if (error) {
+        setBusy(f, false); formError(f, authErrorText(error));
+        if (error.code === 'email_not_confirmed') showAuth('checkEmail');
+        return;
+      }
+      enter(data.session);
+    }
+
+    if (f.id === 'fSignup') {
+      const owner = f.owner.value.trim().replace(/\s+/g, ' '), email = f.email.value.trim(), password = f.password.value;
+      if (!fieldErrors(f, {
+        owner: owner.length >= 2 ? '' : 'اكتب اسمك.',
+        email: validEmail(email) ? '' : 'اكتب بريد صحيح.',
+        password: password.length >= 8 ? '' : 'كلمة السر 8 أحرف على الأقل.'
+      })) return;
+      lastEmail = email;
+      localStorage.setItem(REMEMBER_KEY, '1');
+      setBusy(f, true, 'جاري إنشاء الحساب...');
+      const { data, error } = await sb.auth.signUp({ email, password, options: { data: { owner_name: owner }, emailRedirectTo: APP_URL } });
+      setBusy(f, false);
+      if (error) { formError(f, authErrorText(error)); return; }
+      // Supabase يرجّع مستخدم بدون هويات لو البريد مسجّل من قبل
+      if (data.user && Array.isArray(data.user.identities) && data.user.identities.length === 0) {
+        formError(f, 'هذا البريد عنده حساب. ادخل بدل إنشاء حساب جديد.');
+        return;
+      }
+      if (data.session) enter(data.session);
+      else showAuth('checkEmail');
+    }
+
+    if (f.id === 'fForgot') {
+      const email = f.email.value.trim();
+      if (!fieldErrors(f, { email: validEmail(email) ? '' : 'اكتب بريد صحيح.' })) return;
+      lastEmail = email;
+      setBusy(f, true, 'جاري الإرسال...');
+      const { error } = await sb.auth.resetPasswordForEmail(email, { redirectTo: APP_URL });
+      setBusy(f, false);
+      if (error) { formError(f, authErrorText(error)); return; }
+      f.outerHTML = `<div class="form-ok">إذا كان البريد مسجّلاً، يوصلك رابط لتعيين كلمة سر جديدة خلال دقائق.</div>`;
+    }
+
+    if (f.id === 'fReset') {
+      const password = f.password.value;
+      if (!fieldErrors(f, { password: password.length >= 8 ? '' : 'كلمة السر 8 أحرف على الأقل.' })) return;
+      setBusy(f, true, 'جاري الحفظ...');
+      const { error } = await sb.auth.updateUser({ password });
+      setBusy(f, false);
+      if (error) { formError(f, authErrorText(error)); return; }
+      const { data } = await sb.auth.getSession();
+      toast('تم تغيير كلمة السر.');
+      enter(data.session);
+    }
+
+    if (f.id === 'fStore') {
+      const owner = f.owner.value.trim().replace(/\s+/g, ' '), name = f.store.value.trim().replace(/\s+/g, ' '), city = f.city.value;
+      if (!fieldErrors(f, {
+        owner: owner.length >= 2 ? '' : 'اكتب اسمك.',
+        store: name.length >= 2 ? '' : 'اكتب اسم المحل.',
+        city: city ? '' : 'اختار المدينة.'
+      })) return;
+      setBusy(f, true, 'جاري الحفظ...');
+      const base = defaultState().store;
+      const { data, error } = await sb.from('stores').insert({
+        owner_id: authUser.id, owner_name: owner, name, city,
+        settings: { radius: base.radius, lat: base.lat, lng: base.lng, status: base.status, offerMinutes: base.offerMinutes, template: base.template, offers: base.offers }
+      }).select().single();
+      setBusy(f, false);
+      if (error) { formError(f, error.code === '23505' ? 'عندك محل مسجّل من قبل. أعد تحميل الصفحة.' : authErrorText(error)); return; }
+      storeRow = data;
+      surveyStep = 0; surveyAns = {};
+      showAuth('survey');
+    }
+  });
+
+  // الاستبيان: اختيار الإجابات والتنقل
+  card.addEventListener('click', e => {
+    if (authView !== 'survey') return;
+    const opt = e.target.closest('[data-opt]');
+    if (opt) { pickOption(opt.dataset.opt); return; }
+    const nav = e.target.closest('[data-sv]');
+    if (nav) { nav.dataset.sv === 'back' ? surveyBack() : surveyNext(); }
+  });
+  card.addEventListener('input', e => {
+    if (authView === 'survey' && e.target.id === 'svFollow') {
+      surveyAns.source_detail = e.target.value;
+      updateSurveyNext();
+    }
+  });
+}
+
+/* =========================== 10) استبيان التسجيل ===========================
+   خمسة أسئلة بنقرة وحدة. الإجابات تُحفظ كمفاتيح ثابتة (مثل facebook)
+   حتى يسهل تحليلها، والنص العربي للعرض فقط.
+   ======================================================================= */
+const SURVEY = [
+  { key: 'source', title: 'كيف سمعت عن قريب؟', hint: 'هذا يساعدنا نعرف وين نلقى أصحاب المحلات.', type: 'single',
+    options: [['facebook', 'فيسبوك'], ['instagram', 'إنستغرام'], ['tiktok', 'تيك توك'], ['whatsapp', 'واتساب (رسالة أو مجموعة)'],
+      ['referral', 'صاحب محل أو صديق نصحني'], ['sales_rep', 'مندوب زارنا في المحل'], ['saw_in_store', 'شفت رمز قريب في محل آخر'],
+      ['google', 'بحث في Google'], ['other', 'مصدر آخر']],
+    follow: { referral: ['مين نصحك؟', 'اسم المحل أو الشخص (اختياري)', false], sales_rep: ['اسم المندوب', 'اختياري', false], other: ['وين سمعت عنّا؟', 'مثلاً: معرض، إذاعة...', true] } },
+  { key: 'business_type', title: 'شنو نوع محلك؟', type: 'single',
+    options: [['cafe', 'مقهى'], ['restaurant', 'مطعم'], ['sweets', 'حلويات أو مخبز'], ['fashion', 'ملابس وأحذية'], ['grocery', 'ماركت أو مواد غذائية'], ['other', 'نشاط آخر']] },
+  { key: 'daily_customers', title: 'كم زبون يدخل محلك في اليوم تقريباً؟', type: 'single',
+    options: [['lt50', 'أقل من 50'], ['50_150', 'من 50 إلى 150'], ['150_300', 'من 150 إلى 300'], ['gt300', 'أكثر من 300']] },
+  { key: 'goals', title: 'شنو أهم شي تبيه من قريب؟', hint: 'اختار شيئين على الأكثر.', type: 'multi', max: 2,
+    options: [['repeat', 'الزبون يرجع أكثر'], ['quiet_hours', 'تعبئة الأوقات الهادئة'], ['queue', 'تخفيف الزحمة والطابور'], ['contacts', 'جمع أرقام الزبائن'], ['compete', 'التميّز على المحلات القريبة']] },
+  { key: 'current_loyalty', title: 'كيف تكافئ زبائنك الدائمين الآن؟', type: 'single',
+    options: [['none', 'ما عنديش طريقة'], ['paper', 'بطاقة أختام ورقية'], ['social', 'عروض على فيسبوك أو إنستغرام'], ['personal', 'أعرفهم وأكرمهم بنفسي'], ['app', 'تطبيق أو نظام آخر']] }
+];
+let surveyStep = 0;
+let surveyAns = {};
+let surveyBusy = false;
+let svNoAnim = false; // لا نعيد حركة الدخول عند كل نقرة
+
+function surveyView() {
+  const q = SURVEY[surveyStep];
+  const val = surveyAns[q.key];
+  const picked = k => (q.type === 'multi' ? (val || []).includes(k) : val === k);
+  const full = q.type === 'multi' && (val || []).length >= q.max;
+  const opts = q.options.map(([k, label]) =>
+    `<button type="button" class="sv-opt" data-opt="${k}" aria-pressed="${picked(k)}" ${full && !picked(k) ? 'aria-disabled="true"' : ''}><span class="box" aria-hidden="true"></span>${label}</button>`).join('');
+  const fol = q.follow && q.follow[val];
+  const follow = fol ? `<div class="field sv-follow"><label for="svFollow">${fol[0]}</label><input class="input" id="svFollow" maxlength="120" placeholder="${fol[1]}" value="${esc(surveyAns.source_detail || '')}"></div>` : '';
+  const last = surveyStep === SURVEY.length - 1;
+  svNoAnim = false;
+  return `
+    <div class="steps-line">الخطوة 2 من 2: سؤال سريع</div>
+    <div class="sv-progress" aria-hidden="true">${SURVEY.map((_, i) => `<span class="${i <= surveyStep ? 'on' : ''}"></span>`).join('')}</div>
+    <div class="${svNoAnim ? '' : 'sv-anim'}">
+      <div class="sv-meta"><span class="num">سؤال ${surveyStep + 1} من ${SURVEY.length}</span><span>أقل من دقيقة</span></div>
+      <h2 class="sv-q" id="svQ">${q.title}</h2>
+      <p class="sv-hint">${q.hint || '&nbsp;'}</p>
+      <div class="sv-opts ${q.type}" role="group" aria-labelledby="svQ">${opts}</div>
+      ${follow}
+    </div>
+    <div class="form-err" role="alert" style="margin-top:12px"></div>
+    <div class="sv-nav">
+      ${surveyStep > 0 ? '<button type="button" class="linkish" data-sv="back">رجوع</button>' : '<span></span>'}
+      <button type="button" class="btn btn-primary" data-sv="next" id="svNext">${last ? 'ابدأ استخدام قريب' : 'التالي'}</button>
+    </div>`;
+}
+
+function surveyReady() {
+  const q = SURVEY[surveyStep], v = surveyAns[q.key];
+  if (q.type === 'multi') return (v || []).length > 0;
+  if (!v) return false;
+  const fol = q.follow && q.follow[v];
+  if (fol && fol[2]) return (surveyAns.source_detail || '').trim().length >= 2;
+  return true;
+}
+function updateSurveyNext() { const b = $('#svNext'); if (b) b.disabled = !surveyReady() || surveyBusy; }
+
+function pickOption(k) {
+  const q = SURVEY[surveyStep];
+  if (q.type === 'multi') {
+    const cur = surveyAns[q.key] || [];
+    if (cur.includes(k)) surveyAns[q.key] = cur.filter(x => x !== k);
+    else if (cur.length < q.max) surveyAns[q.key] = [...cur, k];
+    else return;
+  } else {
+    if (q.key === 'source' && surveyAns.source !== k) surveyAns.source_detail = '';
+    surveyAns[q.key] = k;
+  }
+  svNoAnim = true;
+  showAuth('survey');
+  updateSurveyNext();
+  // سؤال باختيار واحد وبدون سؤال إضافي ← ننتقل تلقائياً
+  if (q.type === 'single' && !(q.follow && q.follow[k]) && surveyStep < SURVEY.length - 1) {
+    setTimeout(() => { if (authView === 'survey' && SURVEY[surveyStep] === q) surveyNext(); }, 260);
+  } else {
+    const fi = $('#svFollow'); if (fi) fi.focus();
+  }
+}
+function surveyBack() { if (surveyStep > 0) { surveyStep--; showAuth('survey'); updateSurveyNext(); } }
+
+async function surveyNext() {
+  if (!surveyReady() || surveyBusy) return;
+  if (surveyStep < SURVEY.length - 1) { surveyStep++; showAuth('survey'); updateSurveyNext(); return; }
+  surveyBusy = true; updateSurveyNext();
+  $('#svNext').textContent = 'جاري الحفظ...';
+  const { error } = await sb.from('onboarding_survey').insert({
+    owner_id: authUser.id,
+    source: surveyAns.source,
+    source_detail: (surveyAns.source_detail || '').trim() || null,
+    business_type: surveyAns.business_type,
+    daily_customers: surveyAns.daily_customers,
+    goals: surveyAns.goals || [],
+    current_loyalty: surveyAns.current_loyalty,
+    city: storeRow && storeRow.city
+  });
+  surveyBusy = false;
+  if (error && error.code !== '23505') {
+    $('#svNext').textContent = 'ابدأ استخدام قريب';
+    updateSurveyNext();
+    $('#authCard .form-err').textContent = authErrorText(error);
+    return;
+  }
+  await sb.from('stores').update({ business_type: surveyAns.business_type }).eq('id', storeRow.id);
+  toast('شكراً! محلك جاهز.');
+  startApp(storeRow);
+}
+
+/* ---------- الدخول للنظام بعد التحقق من الجلسة ---------- */
+async function enter(session) {
+  if (!session || entering) return;
+  if (appReady && authUser && authUser.id === session.user.id) return;
+  entering = true;
+  authUser = session.user;
+  showAuth('loading');
+  try {
+    const { data: store, error } = await sb.from('stores').select('*').eq('owner_id', authUser.id).maybeSingle();
+    if (error) throw error;
+    if (!store) { showAuth('store'); return; }
+    storeRow = store;
+    const { data: survey, error: e2 } = await sb.from('onboarding_survey').select('id').eq('owner_id', authUser.id).maybeSingle();
+    if (e2) throw e2;
+    if (!survey) { surveyStep = 0; surveyAns = {}; showAuth('survey'); return; }
+    startApp(store);
+  } catch (err) {
+    authNotice = authErrorText(err);
+    showAuth('login');
+  } finally {
+    entering = false;
+  }
+}
+
+async function signOut() {
+  if (passAnim) togglePassBy();
+  if (watchId !== null) { navigator.geolocation.clearWatch(watchId); watchId = null; }
+  clearTimeout(syncTimer);
+  await flushStoreSync();
+  await sb.auth.signOut();
+  authUser = null; storeRow = null; appReady = false;
+  authNotice = '';
+  showAuth('login');
+}
+
+/* ---------- مزامنة إعدادات المحل مع الحساب ---------- */
+let syncTimer = null;
+let lastSynced = '';
+function storePayload() {
+  const s = state.store;
+  return { name: s.name, settings: { radius: s.radius, lat: s.lat, lng: s.lng, status: s.status, offerMinutes: s.offerMinutes, template: s.template, offers: s.offers } };
+}
+function setSyncState(kind) {
+  const el = $('#syncState');
+  if (!el) return;
+  el.className = 'sync ' + kind;
+  el.textContent = { saved: 'محفوظ في حسابك', saving: 'جاري الحفظ...', error: 'تعذّر الحفظ، نعاود المحاولة' }[kind];
+}
+async function flushStoreSync() {
+  if (!storeRow || !sb || !appReady) return;
+  const payload = storePayload(), json = JSON.stringify(payload);
+  if (json === lastSynced) return;
+  const { error } = await sb.from('stores').update(payload).eq('id', storeRow.id);
+  if (error) { setSyncState('error'); clearTimeout(syncTimer); syncTimer = setTimeout(flushStoreSync, 5000); return; }
+  lastSynced = json;
+  setSyncState('saved');
+}
+function queueStoreSync() {
+  if (!storeRow || !appReady) return;
+  if (JSON.stringify(storePayload()) === lastSynced) return;
+  setSyncState('saving');
+  clearTimeout(syncTimer);
+  syncTimer = setTimeout(flushStoreSync, 1200);
+}
+window.addEventListener('pagehide', () => { flushStoreSync(); });
+
+function applyStoreRow(row) {
+  state.store.name = row.name;
+  state.store.id = row.id.replace(/-/g, '').slice(0, 8);
+  const s = row.settings || {};
+  ['radius', 'lat', 'lng', 'status', 'offerMinutes', 'template'].forEach(k => { if (s[k] !== undefined && s[k] !== null) state.store[k] = s[k]; });
+  if (s.offers) state.store.offers = { ...state.store.offers, ...s.offers };
+}
+
+/* ---------- تشغيل لوحة التحكم لصاحب المحل ---------- */
+let appBound = false;
+function startApp(row) {
+  storeRow = row;
+  LS_KEY = 'qareeb.mvp.v1.' + authUser.id;   // بيانات المحاكاة منفصلة لكل حساب
+  state = load();
+  applyStoreRow(row);
+  lastSynced = JSON.stringify(storePayload());
+  state.sim.inside = measure().inside;
+  save();
+
+  $('#auth').hidden = true;
+  $('#app').hidden = false;
+  $('#acctName').textContent = row.owner_name || authUser.email;
+  $('#acctName').title = authUser.email || '';
+  setSyncState('saved');
+
+  if (!appBound) {
+    renderChips();
+    bindMerchant();
+    bindPhone();
+    bindSim();
+    $('#logoutBtn').addEventListener('click', signOut);
+    appBound = true;
+  }
+  appReady = true;
+  fillInputs();
+  phoneKey = '';
+  render();
+  syncTopH();
+  window.scrollTo(0, 0);
+}
+
+/* ---------- البداية ---------- */
+async function bootAuth() {
+  bindAuth();
+  // خطأ راجع من Google أو من رابط البريد
+  const params = new URLSearchParams(location.search + '&' + location.hash.replace(/^#/, ''));
+  const urlErr = params.get('error_description');
+  if (urlErr) {
+    authNotice = urlErr.includes('expired') ? 'انتهت صلاحية الرابط. اطلب رابط جديد.' : 'تعذّر إكمال الدخول: ' + urlErr;
+    history.replaceState(null, '', APP_URL);
+  }
+  if (!sb) { showAuth('offline'); return; }
+  showAuth('loading');
+
+  sb.auth.onAuthStateChange((event, session) => {
+    // لا نستدعي Supabase داخل هذا المستمع مباشرة (تفادياً للتعليق)
+    setTimeout(() => {
+      if (event === 'PASSWORD_RECOVERY') { authUser = session && session.user; showAuth('reset'); return; }
+      const onboarding = authUser && session && authUser.id === session.user.id && (authView === 'store' || authView === 'survey');
+      if (event === 'SIGNED_IN' && session && !appReady && authView !== 'reset' && !onboarding) enter(session);
+      if (event === 'SIGNED_OUT' && appReady) { appReady = false; authUser = null; showAuth('login'); }
+    }, 0);
+  });
+
+  const { data, error } = await sb.auth.getSession();
+  if (authView === 'reset') return;
+  if (error || !data.session) { showAuth('login'); return; }
+  enter(data.session);
+}
+bootAuth();
 </script>
 </body>
 </html>
