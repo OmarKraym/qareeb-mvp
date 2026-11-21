@@ -498,6 +498,26 @@ td b{white-space:nowrap}
   .acct-name,.sync{display:none}
 }
 
+
+/* ---------- صفحة انضمام الزبون ---------- */
+.join{min-height:100vh;background:var(--limestone);display:flex;justify-content:center;padding:0 0 30px}
+.join-card{width:100%;max-width:440px;background:var(--paper);min-height:100vh;box-shadow:0 0 0 1px var(--line)}
+.join-head{background:var(--harbour-deep);color:#fff;display:flex;align-items:center;gap:12px;padding:22px 22px 20px}
+.join-head b{display:block;font-size:19px;font-weight:800}
+.join-head small{display:block;color:#9FB6B5;font-size:13px}
+.join-av{width:46px;height:46px;border-radius:14px;background:var(--saffron);color:var(--harbour-deep);display:grid;place-items:center;font-weight:800;font-size:20px;flex:none}
+.join-body{padding:24px 22px 8px}
+.join-title{font-size:26px;font-weight:800;margin:0 0 4px}
+.join-sub{color:var(--ink-2);margin:0 0 22px;font-size:15px}
+.join-consent{margin:2px 0 14px;font-size:14px;line-height:1.5;align-items:flex-start}
+.join-consent input{margin-top:3px}
+.join-note{color:var(--ink-3);font-size:12.5px;text-align:center;margin:14px 0 0;line-height:1.6}
+.join-foot{text-align:center;color:var(--ink-3);font-size:12px;margin:26px 0 0}
+.crm-src{font-size:11px;font-weight:700;border-radius:999px;padding:1px 7px;margin-inline-start:6px;vertical-align:middle}
+.crm-src.real{background:var(--mint-soft);color:#1E6B4F}
+.crm-src.demo{background:var(--line-2);color:var(--ink-3)}
+.qr-url a{color:var(--harbour);font-weight:700}
+@media (min-width:500px){.join{padding:30px 0}.join-card{min-height:auto;border-radius:20px;overflow:hidden;box-shadow:0 0 0 1px var(--line),0 20px 40px -24px rgba(7,45,54,.35)}}
 @media (prefers-reduced-motion:reduce){
   *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}
 }
@@ -709,6 +729,9 @@ td b{white-space:nowrap}
   </aside>
 </main>
 </div>
+
+<!-- =================== صفحة انضمام الزبون (من رمز QR) =================== -->
+<div class="join" id="join" hidden><div class="join-card" id="joinCard" aria-live="polite"></div></div>
 
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
@@ -1061,7 +1084,8 @@ function qrSvg(text, margin = 0) {
   return svg;
 }
 // رابط ديناميكي: يتحدّث مع اسم المحل ونطاقه
-const storeQrText = () => `https://qareeb.ly/j/${state.store.id}?n=${encodeURIComponent(state.store.name)}&r=${state.store.radius}`;
+// الرابط الحقيقي لصفحة انضمام الزبون، ثابت لكل محل
+const storeQrText = () => (storeRow ? `${APP_URL}?join=${storeRow.id}` : APP_URL);
 
 function fillInputs() {
   const st = state.store;
@@ -1091,7 +1115,7 @@ function renderSetup() {
   if ($('#qrMerchant').dataset.text !== text) {
     $('#qrMerchant').innerHTML = qrSvg(text);
     $('#qrMerchant').dataset.text = text;
-    $('#qrUrl').textContent = `qareeb.ly/j/${st.id}`;
+    $('#qrUrl').innerHTML = `<a href="${esc(text)}" target="_blank" rel="noopener">افتح صفحة الانضمام</a>`;
   }
 }
 
@@ -1152,7 +1176,7 @@ function renderCRM() {
   const meId = state.phone.customerId;
   const rows = state.customers.map(c => `
     <tr class="${c.id === meId ? 'is-me' : ''}">
-      <td><b>${esc(c.name)}</b>${c.id === meId ? ' <small style="color:var(--saffron-ink)">(على الهاتف)</small>' : ''}</td>
+      <td><b>${esc(c.name)}</b><span class="crm-src ${c.real ? 'real' : 'demo'}">${c.real ? 'QR' : 'تجريبي'}</span>${c.id === meId ? ' <small style="color:var(--saffron-ink)">(على الهاتف)</small>' : ''}</td>
       <td><span class="ltr num">${esc(c.phone)}</span></td>
       <td class="num">${c.visits}</td>
       <td>${c.waConnected ? '<span class="tag quiet">مربوط</span>' : '<span style="color:var(--ink-3);font-size:12.5px">غير مربوط</span>'}</td>
@@ -1557,7 +1581,7 @@ function bindMerchant() {
 
   $('#crmBody').addEventListener('click', e => {
     const v = e.target.closest('[data-visit]'), o = e.target.closest('[data-open]');
-    if (v) { commit(s => { const c = s.customers.find(x => x.id === v.dataset.visit); if (c) c.visits += 1; }); toast('سُجّلت زيارة.'); }
+    if (v) { let cv = null; commit(s => { const c = s.customers.find(x => x.id === v.dataset.visit); if (c) { c.visits += 1; cv = c; } }); pushVisits(cv); toast('سُجّلت زيارة.'); }
     if (o) {
       commit(s => {
         s.phone.customerId = o.dataset.open; s.phone.screen = 'app'; s.phone.tab = 'pass';
@@ -1576,6 +1600,7 @@ function bindMerchant() {
     state = defaultState();
     state.store = keepStore;
     save(); fillInputs(); render(); renderPhone(true);
+    refreshCustomers(); // الزبائن الحقيقيون يرجعون من قاعدة البيانات
     toast('مسحنا بيانات المحاكاة. إعدادات محلك باقية.');
   });
 }
@@ -1619,17 +1644,17 @@ function bindPhone() {
       case 'open-wa': commit(s => { s.phone.screen = 'app'; s.phone.tab = 'wa'; s.phone.unread = 0; }); break;
       case 'unlock': commit(s => { s.phone.screen = 'app'; }); break;
       case 'redeem': {
-        let n = 0;
+        let n = 0, rc = null;
         commit(s => {
           const entry = s.log.find(l => l.id === el.dataset.log);
           const c = customerById(s.phone.customerId);
           if (!entry || !c || entryStatus(entry) !== 'active') return;
           entry.redeemed = true; entry.redeemedAt = Date.now();
-          c.visits += 1; n = c.visits;
+          c.visits += 1; n = c.visits; rc = c;
           if (c.waConnected) s.phone.messages.push({ id: uid(), customerId: c.id, kind: 'system', at: Date.now(), text: `تم استخدام العرض. هذه زيارتك رقم ${c.visits}` });
           freshLogId = entry.id;
         });
-        if (n) toast(`استُخدم العرض في المحل. الزيارة رقم ${n}.`);
+        if (n) { pushVisits(rc); toast(`استُخدم العرض في المحل. الزيارة رقم ${n}.`); }
         break;
       }
     }
@@ -2260,6 +2285,7 @@ async function signOut() {
   if (watchId !== null) { navigator.geolocation.clearWatch(watchId); watchId = null; }
   clearTimeout(syncTimer);
   await flushStoreSync();
+  if (custChannel) { sb.removeChannel(custChannel); custChannel = null; }
   await sb.auth.signOut();
   authUser = null; storeRow = null; appReady = false;
   authNotice = '';
@@ -2336,10 +2362,13 @@ function startApp(row) {
   render();
   syncTopH();
   window.scrollTo(0, 0);
+  refreshCustomers();   // الزبائن اللي سجّلوا من رمز QR
+  watchCustomers();     // وتحديث لحظي لما ينضم زبون جديد
 }
 
 /* ---------- البداية ---------- */
 async function bootAuth() {
+  if (JOIN_ID) { bootJoin(); return; } // صفحة الزبون لا تحتاج دخول
   bindAuth();
   // خطأ راجع من Google أو من رابط البريد
   const params = new URLSearchParams(location.search + '&' + location.hash.replace(/^#/, ''));
@@ -2366,6 +2395,208 @@ async function bootAuth() {
   if (error || !data.session) { showAuth('login'); return; }
   enter(data.session);
 }
+
+/* =====================================================================
+   11) صفحة انضمام الزبون (تفتح من رمز QR الحقيقي)
+   ---------------------------------------------------------------------
+   الرابط: ...qareeb-mvp/?join=<معرّف المحل>
+   - لا تحتاج حساب: الزبون يكتب اسمه ورقمه فقط.
+   - الحفظ عبر دوال Supabase العامة (join_store) وليس بقراءة الجداول مباشرة،
+     فالزبون ما يقدر يشوف بيانات زبائن آخرين.
+   - معرّف بطاقة الزبون يُحفظ في هاتفه، فيرجع لبطاقته لما يمسح الرمز مرة ثانية.
+   ===================================================================== */
+const JOIN_ID = new URLSearchParams(location.search).get('join');
+const PASS_KEY = id => 'qareeb.pass.' + id;
+let joinStore = null;
+let joinPass = null;
+
+function joinErrorText(err) {
+  const m = ((err && err.message) || '').toLowerCase();
+  if (m.includes('bad_phone')) return 'رقم ليبي من 10 أرقام يبدأ بـ 091 أو 092 أو 094.';
+  if (m.includes('bad_name')) return 'اكتب اسمك (حرفين على الأقل).';
+  if (m.includes('store_not_found')) return 'هذا المحل غير موجود. ربما الرمز قديم.';
+  return authErrorText(err);
+}
+
+function joinRender(view, msg = '') {
+  const card = $('#joinCard');
+  const initial = (joinStore && joinStore.name.trim()[0]) || (joinPass && joinPass.store_name.trim()[0]) || 'ق';
+  if (view === 'loading') {
+    card.innerHTML = `<div class="auth-loading" style="padding:60px 0"><span class="spinner" aria-hidden="true"></span><p>جاري التحميل...</p></div>`;
+    return;
+  }
+  if (view === 'error') {
+    card.innerHTML = `<div class="join-body"><h1 class="join-title">تعذّر فتح الصفحة</h1><p class="join-sub">${esc(msg)}</p>
+      <button type="button" class="btn btn-primary btn-block" onclick="location.reload()">إعادة المحاولة</button></div>`;
+    return;
+  }
+  if (view === 'form') {
+    card.innerHTML = `
+      <div class="join-head">
+        <span class="join-av">${esc(initial)}</span>
+        <div><b>${esc(joinStore.name)}</b><small>${esc(joinStore.city || '')}</small></div>
+      </div>
+      <div class="join-body">
+        <h1 class="join-title">بطاقة الولاء</h1>
+        <p class="join-sub">سجّل مرة وحدة. بطاقتك تجمع زياراتك وتوصلك عروض المحل.</p>
+        <form id="fJoin" novalidate>
+          <div class="field">
+            <label for="j-name">اسمك</label>
+            <input class="input" id="j-name" name="name" autocomplete="name" maxlength="40" placeholder="مثلاً: سالم">
+            <div class="field-err" data-err="name"></div>
+          </div>
+          <div class="field">
+            <label for="j-phone">رقم الهاتف</label>
+            <input class="input ltr" style="display:block;text-align:right" id="j-phone" name="phone" inputmode="tel" autocomplete="tel" placeholder="091XXXXXXX" maxlength="16">
+            <div class="field-err" data-err="phone"></div>
+          </div>
+          <label class="check join-consent"><input type="checkbox" name="wa"> أوافق على استقبال عروض ${esc(joinStore.name)} عبر واتساب</label>
+          <div class="form-err" role="alert"></div>
+          <button class="btn btn-primary btn-block" type="submit">أنشئ بطاقتي</button>
+          <p class="join-note">رقمك يشوفه صاحب المحل فقط، ويقدر توقف الرسائل في أي وقت.</p>
+        </form>
+      </div>
+      <p class="join-foot">بواسطة قريب</p>`;
+    return;
+  }
+  if (view === 'pass') {
+    const p = joinPass, stamps = 8;
+    const filled = p.visits % stamps === 0 && p.visits > 0 ? stamps : p.visits % stamps;
+    const left = stamps - filled;
+    const cups = Array.from({ length: stamps }, (_, i) => `<span class="${i < filled ? 'on' : ''}"></span>`).join('');
+    card.innerHTML = `
+      <div class="join-body">
+        ${msg ? `<div class="form-ok">${esc(msg)}</div>` : ''}
+        <div class="pass" aria-label="بطاقة الولاء">
+          <div class="pass-top">
+            <span class="logo"><i>${esc(p.store_name.trim()[0] || 'ق')}</i>${esc(p.store_name)}</span>
+            <span class="pts"><small>الزيارات</small><b class="num">${p.visits}</b></span>
+          </div>
+          <div class="pass-strip">
+            <small>${left === 0 ? 'مشروبك القادم مجاني 🎉' : `باقي ${left} ${left === 1 ? 'زيارة' : 'زيارات'} لمشروب مجاني`}</small>
+            <div class="cups" aria-hidden="true">${cups}</div>
+          </div>
+          <div class="pass-fields">
+            <div><small>العضو</small>${esc(p.name)}</div>
+            <div style="text-align:left"><small>رقم العضوية</small><span class="ltr num">${esc(p.customer_id.slice(0, 6).toUpperCase())}</span></div>
+          </div>
+          <div class="pass-qr" style="width:150px;height:150px">${qrSvg('QRB-' + p.customer_id, 1)}</div>
+        </div>
+        <p class="join-sub" style="margin:16px 0 0;text-align:center;font-weight:700;color:var(--ink)">اعرض هذا الرمز للكاشير في كل زيارة.</p>
+        <p class="join-note">للرجوع لبطاقتك بسرعة: من قائمة المتصفح اختار «إضافة إلى الشاشة الرئيسية».</p>
+        <button type="button" class="linkish" style="display:block;margin:18px auto 0" data-join="reset">مش أنت؟ سجّل برقم آخر</button>
+      </div>
+      <p class="join-foot">بواسطة قريب</p>`;
+  }
+}
+
+async function bootJoin() {
+  $('#auth').hidden = true;
+  $('#app').hidden = true;
+  $('#join').hidden = false;
+  document.title = 'بطاقة الولاء — قريب';
+  joinRender('loading');
+  if (!sb) { joinRender('error', 'تعذّر الاتصال. تأكد من الإنترنت وأعد تحميل الصفحة.'); return; }
+  if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(JOIN_ID)) {
+    joinRender('error', 'رمز QR غير صالح. اطلب من المحل رمزاً جديداً.');
+    return;
+  }
+
+  const card = $('#joinCard');
+  card.addEventListener('click', e => {
+    if (e.target.closest('[data-join="reset"]')) {
+      localStorage.removeItem(PASS_KEY(JOIN_ID));
+      joinPass = null;
+      bootJoinLoad();
+    }
+  });
+  card.addEventListener('submit', async e => {
+    if (e.target.id !== 'fJoin') return;
+    e.preventDefault();
+    const f = e.target;
+    formError(f, '');
+    const name = f.name.value.trim().replace(/\s+/g, ' ');
+    let phone = toLatinDigits(f.phone.value).replace(/[\s\-()]/g, '').replace(/^(\+|00)218/, '0');
+    if (/^9[124]\d{7}$/.test(phone)) phone = '0' + phone;
+    if (!fieldErrors(f, {
+      name: name.length >= 2 ? '' : 'اكتب اسمك (حرفين على الأقل).',
+      phone: /^09[124]\d{7}$/.test(phone) ? '' : 'رقم ليبي من 10 أرقام يبدأ بـ 091 أو 092 أو 094.'
+    })) return;
+    setBusy(f, true, 'جاري إنشاء البطاقة...');
+    try {
+      const { data, error } = await withTimeout(sb.rpc('join_store', { p_store: JOIN_ID, p_name: name, p_phone: phone, p_wa: f.wa.checked }));
+      if (error) throw error;
+      const row = data && data[0];
+      if (!row) throw { message: 'no_row' };
+      localStorage.setItem(PASS_KEY(JOIN_ID), row.customer_id);
+      joinPass = { customer_id: row.customer_id, name: row.name, visits: row.visits, store_name: joinStore.name, store_city: joinStore.city };
+      joinRender('pass', row.is_new ? 'بطاقتك جاهزة. أهلاً بيك!' : 'عندك بطاقة في هذا المحل من قبل. هذي هي.');
+    } catch (err) {
+      setBusy(f, false);
+      formError(f, joinErrorText(err));
+    }
+  });
+  bootJoinLoad();
+}
+
+async function bootJoinLoad() {
+  joinRender('loading');
+  try {
+    const saved = localStorage.getItem(PASS_KEY(JOIN_ID));
+    if (saved) {
+      const { data, error } = await withTimeout(sb.rpc('get_pass', { p_customer: saved }));
+      if (!error && data && data[0]) { joinPass = data[0]; joinRender('pass'); return; }
+      localStorage.removeItem(PASS_KEY(JOIN_ID));
+    }
+    const { data, error } = await withTimeout(sb.rpc('get_store_public', { p_store: JOIN_ID }));
+    if (error) throw error;
+    if (!data || !data[0]) { joinRender('error', 'هذا المحل غير موجود. ربما الرمز قديم.'); return; }
+    joinStore = data[0];
+    joinRender('form');
+    if (window.innerWidth > 860) { const n = $('#j-name'); if (n) n.focus(); }
+  } catch (err) {
+    joinRender('error', joinErrorText(err));
+  }
+}
+
+/* ---------- زبائن حقيقيون في لوحة صاحب المحل ---------- */
+let custChannel = null;
+async function refreshCustomers(announce = false) {
+  if (!storeRow || !appReady || !sb) return;
+  const { data, error } = await sb.from('customers')
+    .select('id,name,phone,visits,wa_opt_in,created_at')
+    .eq('store_id', storeRow.id).order('created_at', { ascending: false }).limit(500);
+  if (error || !data) return;
+  const known = new Set(state.customers.filter(c => c.real).map(c => c.id));
+  const real = data.map(r => {
+    const old = state.customers.find(c => c.id === r.id);
+    return { id: r.id, name: r.name, phone: r.phone, visits: r.visits, joinedAt: Date.parse(r.created_at),
+      waConnected: r.wa_opt_in, lastNotifiedAt: old ? old.lastNotifiedAt : null, real: true };
+  });
+  const phones = new Set(real.map(r => r.phone));
+  const others = state.customers.filter(c => !c.real && !phones.has(c.phone));
+  if (announce) real.filter(r => !known.has(r.id)).forEach(r => toast(`انضم زبون جديد: ${r.name}`));
+  state.customers = [...real, ...others];
+  save();
+  render();
+}
+function watchCustomers() {
+  if (custChannel) { sb.removeChannel(custChannel); custChannel = null; }
+  if (!storeRow) return;
+  custChannel = sb.channel('customers-' + storeRow.id)
+    .on('postgres_changes', { event: '*', schema: 'public', table: 'customers', filter: `store_id=eq.${storeRow.id}` },
+      () => refreshCustomers(true))
+    .subscribe();
+}
+window.addEventListener('focus', () => { if (appReady) refreshCustomers(true); });
+
+// حفظ عدد الزيارات للزبون الحقيقي في قاعدة البيانات
+async function pushVisits(c) {
+  if (!c || !c.real || !sb) return;
+  const { error } = await sb.from('customers').update({ visits: c.visits }).eq('id', c.id);
+  if (error) toast('تعذّر حفظ الزيارة في الحساب. حاول مرة ثانية.');
+}
+
 bootAuth();
 </script>
 </body>
